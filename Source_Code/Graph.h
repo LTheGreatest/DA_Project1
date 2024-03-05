@@ -1,20 +1,15 @@
-// Original code by Gonçalo Leão
-// Updated by DA 2023/2024 Team
-
-#ifndef DA_TP_CLASSES_GRAPH
-#define DA_TP_CLASSES_GRAPH
+#ifndef GRAPH
+#define GRAPH
 
 #include <iostream>
 #include <vector>
 #include <queue>
 #include <limits>
 #include <algorithm>
-#include "../data_structures/MutablePriorityQueue.h"
 
 template <class T>
 class Edge;
 
-#define INF std::numeric_limits<double>::max()
 
 /************************* Vertex  **************************/
 
@@ -664,4 +659,4 @@ Graph<T>::~Graph() {
     deleteMatrix(pathMatrix, vertexSet.size());
 }
 
-#endif /* DA_TP_CLASSES_GRAPH */
+#endif

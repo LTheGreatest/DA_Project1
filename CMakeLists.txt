@@ -11,8 +11,20 @@ include_directories(Source_Code)
 
 set( CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE_TMP} )
 
-add_executable(Project1
+add_executable(Test
         Source_Code/Graph.h
 )
 
-target_link_libraries(Project1 gtest gtest_main)
+target_link_libraries(Test gtest gtest_main)
+
+# List your source files for the executable
+set(SOURCE_FILES
+        Source_Code/Graph.h
+        Source_Code/Main.cpp
+)
+
+# Define the executable target
+add_executable(Main ${SOURCE_FILES})
+
+
+
