@@ -1,5 +1,8 @@
-#ifndef GRAPH
-#define GRAPH
+// Original code by Gonçalo Leão
+// Updated by DA 2023/2024 Team
+
+#ifndef DA_TP_CLASSES_GRAPH
+#define DA_TP_CLASSES_GRAPH
 
 #include <iostream>
 #include <vector>
@@ -10,15 +13,12 @@
 template <class T>
 class Edge;
 
-
 /************************* Vertex  **************************/
 
 template <class T>
 class Vertex {
 public:
     Vertex(T in);
-    bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
-
     T getInfo() const;
     std::vector<Edge<T> *> getAdj() const;
     bool isVisited() const;
@@ -37,8 +37,6 @@ public:
     Edge<T> * addEdge(Vertex<T> *dest, double w);
     bool removeEdge(T in);
     void removeOutgoingEdges();
-
-    friend class MutablePriorityQueue<Vertex>;
 protected:
     T info;                // info node
     std::vector<Edge<T> *> adj;  // outgoing edges
@@ -659,4 +657,4 @@ Graph<T>::~Graph() {
     deleteMatrix(pathMatrix, vertexSet.size());
 }
 
-#endif
+#endif /* DA_TP_CLASSES_GRAPH */
