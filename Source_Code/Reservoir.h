@@ -16,7 +16,6 @@ class Reservoir : public Site{
         void setReservoirMunicipality(std::string municipality_){municipality = municipality_;}
         void setReservoirId(int id_){id = id_;}
         void setReservoirMaxDelivery(double max_delivery_){max_delivery = max_delivery_;}
-        virtual void f(){};
     private:
         std::string name, municipality;
         int id;

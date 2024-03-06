@@ -7,7 +7,6 @@ class Station : public Site{
         Station(std::string code , int id_) : Site(code) , id(id_) {};
         int getStationId(){return id;}
         void setStationId(int id_){id = id_;}
-        virtual void f(){};
     private:
         int id;
 };

@@ -7,7 +7,7 @@
 class Site {
     public:
         Site(std::string code_) : code(code_) {};
-        virtual void f();
+        virtual ~Site();
         std::string getReservoirCode(){return code;}
         void setReservoirCode(std::string code_){code = code_;}
     private:
