@@ -8,8 +8,9 @@ class Site {
     public:
         Site(std::string code_) : code(code_) {};
         virtual ~Site();
-        std::string getReservoirCode(){return code;}
-        void setReservoirCode(std::string code_){code = code_;}
+        std::string getCode(){return code;}
+        void setCode(std::string code_){code = code_;}
+        bool operator==(const Site &other){return this->code == other.code;}
     private:
         std::string code;
 };

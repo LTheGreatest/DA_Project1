@@ -364,7 +364,7 @@ Vertex<T*> * Graph<T>::findVertex(const T* in) const {
 template <class T>
 int Graph<T>::findVertexIdx(const T *in) const {
     for (unsigned i = 0; i < vertexSet.size(); i++)
-        if (vertexSet[i]->getInfo() == *in)
+        if (*vertexSet[i]->getInfo() == *in)
             return i;
     return -1;
 }
