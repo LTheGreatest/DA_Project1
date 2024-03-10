@@ -1,14 +1,15 @@
 #ifndef PROJECT1_STATION_H
 #define PROJECT1_STATION_H
 #include <string>
-#include "Site.h"
-class Station : public Site{
+
+class Station{
     public:
-        Station(std::string code , int id_) : Site(code) , id(id_) {};
+        Station(std::string code_ , int id_) : code(code_) , id(id_) {};
         int getStationId(){return id;}
         void setStationId(int id_){id = id_;}
     private:
         int id;
+        std::string code;
 };
 
 

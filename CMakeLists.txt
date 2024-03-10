@@ -13,6 +13,11 @@ set( CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE_TMP} )
 
 add_executable(Test
         Source_Code/Graph.h
+        Source_Code/Reservoir.h
+        Source_Code/Station.h
+        Source_Code/WaterSupplyManagement.cpp
+        Source_Code/WaterSupplyManagement.h
+        Source_Code/City.h
 )
 
 target_link_libraries(Test gtest gtest_main)
@@ -21,6 +26,12 @@ target_link_libraries(Test gtest gtest_main)
 set(SOURCE_FILES
         Source_Code/Graph.h
         Source_Code/Main.cpp
+        Source_Code/Reservoir.h
+        Source_Code/Station.h
+        Source_Code/VertexType.h
+        Source_Code/WaterSupplyManagement.cpp
+        Source_Code/WaterSupplyManagement.h
+        Source_Code/City.h
 )
 
 # Define the executable target

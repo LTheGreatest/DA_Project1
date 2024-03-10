@@ -9,6 +9,7 @@
 #include <queue>
 #include <limits>
 #include <algorithm>
+#include "VertexType.h"
 
 template <class T>
 class Edge;
@@ -18,8 +19,9 @@ class Edge;
 template <class T>
 class Vertex {
 public:
-    Vertex(T in);
+    Vertex(T in, VertexType type_);
     T getInfo() const;
+    VertexType getType() const;
     std::vector<Edge<T> *> getAdj() const;
     bool isVisited() const;
     bool isProcessing() const;
@@ -37,9 +39,13 @@ public:
     Edge<T> * addEdge(Vertex<T> *dest, double w);
     bool removeEdge(T in);
     void removeOutgoingEdges();
+    bool operator<(Vertex<T> & vertex) const;
+
 protected:
     T info;                // info node
     std::vector<Edge<T> *> adj;  // outgoing edges
+    VertexType type;
+
 
     // auxiliary fields
     bool visited = false; // used by DFS, BFS, Prim ...
@@ -142,7 +148,7 @@ void deleteMatrix(double **m, int n);
 /************************* Vertex  **************************/
 
 template <class T>
-Vertex<T>::Vertex(T in): info(in) {}
+Vertex<T>::Vertex(T in, VertexType type_): info(in), type(type_) {}
 /*
  * Auxiliary function to add an outgoing edge to a vertex (this),
  * with a given destination vertex (d) and edge weight (w).
@@ -200,6 +206,11 @@ bool Vertex<T>::operator<(Vertex<T> & vertex) const {
 template <class T>
 T Vertex<T>::getInfo() const {
     return this->info;
+}
+
+template <class T>
+VertexType Vertex<T>::getType() const{
+    return this->type;
 }
 
 template <class T>
