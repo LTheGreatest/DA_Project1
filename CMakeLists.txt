@@ -32,6 +32,7 @@ set(SOURCE_FILES
         Source_Code/WaterSupplyManagement.cpp
         Source_Code/WaterSupplyManagement.h
         Source_Code/City.h
+        Source_Code/DataSetSelection.h
 )
 
 # Define the executable target

@@ -9,6 +9,10 @@
 
 class City{
 public:
+
+    City(std::string name_, int id_, std::string code_, int demand_, int population_) :
+        name(name_),id(id_), code(code_), demand(demand_), population(population_) {};
+
     //Getters
     std::string getName() const {return name;}
     std::string getCode() const {return code;}
