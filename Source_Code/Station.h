@@ -4,12 +4,13 @@
 
 class Station{
     public:
+        Station()=default;
         Station(std::string code_ , int id_) : code(code_) , id(id_) {};
         int getStationId(){return id;}
         void setStationId(int id_){id = id_;}
 
         //Operator
-        bool operator==(const Station &other){
+        bool operator==(const Station &other) const{
             return (id == other.id) && (code == other.code);
         }
     private:

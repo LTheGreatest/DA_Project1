@@ -38,6 +38,18 @@ void WaterSupplyManagement::getStation(const std::string& code, Station *station
     }
 }
 
+unordered_map<std::string, Reservoir> WaterSupplyManagement::getCodeToReservoir() const {
+    return codeToReservoir;
+}
+
+unordered_map<std::string, Station> WaterSupplyManagement::getCodeToStation() const {
+    return codeToStation;
+}
+
+unordered_map<std::string, City> WaterSupplyManagement::getCodeToCity() const {
+    return codeToCity;
+}
+
 void WaterSupplyManagement::selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath) {
     switch (dataset) {
         case DataSetSelection::SMALL:
@@ -234,17 +246,7 @@ void WaterSupplyManagement::readPipes(DataSetSelection dataset) {
     }
 }
 
-unordered_map<std::string, Reservoir> WaterSupplyManagement::getCodeToReservoir() const {
-    return codeToReservoir;
-}
 
-unordered_map<std::string, Station> WaterSupplyManagement::getCodeToStation() const {
-    return codeToStation;
-}
-
-unordered_map<std::string, City> WaterSupplyManagement::getCodeToCity() const {
-    return codeToCity;
-}
 
 //Data insertion
 /*

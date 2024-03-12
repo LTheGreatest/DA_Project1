@@ -6,6 +6,7 @@ class Reservoir{
     public:
         //Constructor
         Reservoir(std::string name_, std::string municipality_, int id_, std::string code_, double max_delivery_) : code(code_),name(name_) , municipality(municipality_) , id(id_) , max_delivery(max_delivery_) {};
+        Reservoir()=default;
 
         //Getters
         std::string getReservoirName(){ return name; }
@@ -21,7 +22,7 @@ class Reservoir{
         void setReservoirMaxDelivery(double max_delivery_){max_delivery = max_delivery_;}
 
         //Operator
-        bool operator==(const Reservoir &other){
+        bool operator==(const Reservoir &other) const{
             return (name == other.name) && (municipality == other.municipality) && (code == other.code) && (id == other.id) && (max_delivery == other.max_delivery);
         }
     private:
