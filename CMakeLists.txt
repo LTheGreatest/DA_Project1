@@ -18,6 +18,7 @@ add_executable(Test
         Source_Code/WaterSupplyManagement.cpp
         Source_Code/WaterSupplyManagement.h
         Source_Code/City.h
+        tests/tests.cpp
 )
 
 target_link_libraries(Test gtest gtest_main)

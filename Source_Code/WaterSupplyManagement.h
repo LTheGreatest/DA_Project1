@@ -14,6 +14,7 @@
 
 class WaterSupplyManagement {
 public:
+    WaterSupplyManagement()= default;
     //data readers
     void readReservoirs(DataSetSelection dataset);
     void readStations(DataSetSelection dataset);
@@ -24,16 +25,19 @@ public:
     void insertReservoir(std::string code);
     void insertStation(std::string code);
     void insertCity(std::string code);
-    void insertPipe(std::string code1, std::string code2);
     void insertAll();
 
     //Getters
     void getCity(const std::string& code, City *city) const;
-    void getReservoir(std::string code, Reservoir *reservoir) const;
-    void getStation(std::string code, Station *station) const;
+    void getReservoir(const std::string& code, Reservoir *reservoir) const;
+    void getStation(const std::string& code, Station *station) const;
+    std::unordered_map<std::string, Reservoir> getCodeToReservoir() const;
+    std::unordered_map<std::string, Station> getCodeToStation() const;
+    std::unordered_map<std::string, City> getCodeToCity() const;
+
     Graph<std::string> getNetwork() const;
 
-    void selectDataSet(DataSetSelection dataset, std::string *filepath);
+    static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);
 private:
     Graph<std::string> network;
     std::unordered_map<std::string, Reservoir> codeToReservoir;

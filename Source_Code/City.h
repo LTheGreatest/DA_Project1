@@ -10,6 +10,7 @@
 class City{
 public:
 
+    City()= default;
     City(std::string name_, int id_, std::string code_, int demand_, int population_) :
         name(name_),id(id_), code(code_), demand(demand_), population(population_) {};
 
@@ -26,6 +27,11 @@ public:
     void setId(int id) {this->id = id;}
     void setPopulation(int population) {this->population = population;}
     void setDemand(int demand) {this->demand = demand;}
+
+    //operator
+    bool operator==(const City &other) const{
+        return (name == other.name) && (code == other.code) && (id == other.id) && (population == other.population) && (demand == other.demand);
+    }
 
 private:
     std::string name, code;
