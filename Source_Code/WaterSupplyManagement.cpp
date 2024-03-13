@@ -95,6 +95,10 @@ void WaterSupplyManagement::readCities(DataSetSelection dataset) {
     selectDataSet(dataset, VertexType::CITIES, &filepath);
 
     ifstream file(filepath);
+    if(!file.is_open()){
+        cerr << "Error: Unable to open the file." << '\n';
+    }
+
     string line;
 
     getline(file,line); //header line
@@ -137,6 +141,10 @@ void WaterSupplyManagement::readReservoirs(DataSetSelection dataset) {
     selectDataSet(dataset,VertexType::RESERVOIR, &filepath);
 
     ifstream file(filepath);
+    if(!file.is_open()){
+        cerr << "Error: Unable to open the file." << '\n';
+    }
+
     string line;
 
     getline(file,line); //header line
@@ -183,6 +191,10 @@ void WaterSupplyManagement::readStations(DataSetSelection dataset) {
     selectDataSet(dataset,VertexType::STATIONS, &filepath);
 
     ifstream file(filepath);
+    if(!file.is_open()){
+        cerr << "Error: Unable to open the file." << '\n';
+    }
+
     string line;
 
     getline(file,line); //header line
@@ -210,6 +222,10 @@ void WaterSupplyManagement::readPipes(DataSetSelection dataset) {
     selectDataSet(dataset,VertexType::PIPE, &filepath);
 
     ifstream file(filepath);
+    if(!file.is_open()){
+        cerr << "Error: Unable to open the file." << '\n';
+    }
+
     string line;
 
     getline(file,line); //header line
@@ -248,10 +264,71 @@ void WaterSupplyManagement::readPipes(DataSetSelection dataset) {
 
 
 
-//Data insertion
-/*
-void WaterSupplyManagement::insertReservoir(std::string code) {
+//Data insertion ================================================================================================
 
+bool WaterSupplyManagement::insertReservoir(string code) {
+    Vertex<string> *reservoir = network.findVertex(code);
+
+    if(reservoir != nullptr){
+        //reservoir already exists
+        return false;
+    }
+
+    network.addVertex(code, VertexType::RESERVOIR);
+    return true;
 }
-*/
+
+bool WaterSupplyManagement::insertStation(std::string code) {
+    Vertex<string> *station = network.findVertex(code);
+
+    if(station != nullptr){
+        //station already exists
+        return  false;
+    }
+
+    network.addVertex(code, VertexType::STATIONS);
+    return true;
+}
+
+bool WaterSupplyManagement::insertCity(std::string code) {
+    Vertex<string> *city = network.findVertex(code);
+
+    if(city != nullptr){
+        //city already exists
+        return false;
+    }
+
+    network.addVertex(code, VertexType::CITIES);
+    return true;
+}
+
+void WaterSupplyManagement::insertAll() {
+
+    //insert cities
+    for(pair<string, City> codeCity : codeToCity){
+        insertCity(codeCity.first);
+    }
+
+    //insert stations
+    for(pair<string, Station> codeStation : codeToStation){
+        insertStation(codeStation.first);
+    }
+
+    //insert reservoir
+    for(pair<string, Reservoir> codeReservoir : codeToReservoir){
+        insertReservoir(codeReservoir.first);
+    }
+}
+
+//Deletes =============================================================================
+bool WaterSupplyManagement::deletePipe(const std::string &source, const std::string &dest) {
+    return network.removeEdge(source, dest);
+}
+
+//Reset ===============================================================================
+void WaterSupplyManagement::resetSystem() {
+    Graph<string> newSystem;
+    network = newSystem;
+}
+
 

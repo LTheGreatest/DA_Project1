@@ -21,11 +21,15 @@ public:
     void readCities(DataSetSelection dataset);
     void readPipes(DataSetSelection dataset);
 
-    //data inserters (to help filter the network)
-    void insertReservoir(std::string code);
-    void insertStation(std::string code);
-    void insertCity(std::string code);
+    //data inserts and deletes (to help filter the network)
+    bool insertReservoir(std::string code);
+    bool insertStation(std::string code);
+    bool insertCity(std::string code);
     void insertAll();
+    bool deletePipe(const std::string &source, const std::string &dest);
+
+    //System reset
+    void resetSystem();
 
     //Getters
     void getCity(const std::string& code, City *city) const;
