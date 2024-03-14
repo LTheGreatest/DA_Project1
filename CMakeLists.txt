@@ -19,6 +19,8 @@ add_executable(Test
         Source_Code/WaterSupplyManagement.h
         Source_Code/City.h
         tests/tests.cpp
+        Source_Code/Menu.cpp
+        Source_Code/Menu.h
 )
 
 target_link_libraries(Test gtest gtest_main)
@@ -34,6 +36,8 @@ set(SOURCE_FILES
         Source_Code/WaterSupplyManagement.h
         Source_Code/City.h
         Source_Code/DataSetSelection.h
+        Source_Code/Menu.cpp
+        Source_Code/Menu.h
 )
 
 # Define the executable target
