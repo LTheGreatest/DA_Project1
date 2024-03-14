@@ -89,7 +89,9 @@ void WaterSupplyManagement::selectDataSet(DataSetSelection dataset, VertexType t
 }
 
 //data readers =========================================================================
-
+/** Reads data from the cities file and stores it in a hash map
+ *  Complexity: O(n)
+ */
 void WaterSupplyManagement::readCities(DataSetSelection dataset) {
     string filepath;
     selectDataSet(dataset, VertexType::CITIES, &filepath);
@@ -136,6 +138,9 @@ void WaterSupplyManagement::readCities(DataSetSelection dataset) {
     }
 }
 
+/** Reads data from the reservoirs file and stores it in a hash map
+ *  Complexity: O(n)
+ */
 void WaterSupplyManagement::readReservoirs(DataSetSelection dataset) {
     string filepath;
     selectDataSet(dataset,VertexType::RESERVOIR, &filepath);
@@ -185,7 +190,9 @@ void WaterSupplyManagement::readReservoirs(DataSetSelection dataset) {
 
 }
 
-
+/** Reads data from the stations file and stores it in a hash map
+ *  Complexity: O(n)
+ */
 void WaterSupplyManagement::readStations(DataSetSelection dataset) {
     string filepath;
     selectDataSet(dataset,VertexType::STATIONS, &filepath);
@@ -217,6 +224,9 @@ void WaterSupplyManagement::readStations(DataSetSelection dataset) {
     }
 }
 
+/** Reads data from the pipes file and creates edges in the graph with the data read
+ *  Complexity: O(n)
+ */
 void WaterSupplyManagement::readPipes(DataSetSelection dataset) {
     string filepath;
     selectDataSet(dataset,VertexType::PIPE, &filepath);

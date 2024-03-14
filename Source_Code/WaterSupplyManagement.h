@@ -13,6 +13,14 @@
 #include "DataSetSelection.h"
 
 class WaterSupplyManagement {
+    /**
+ * @file WaterSupplyManagement.h
+ * @brief Definition of class WaterSupplyManagement.
+ *
+ * \class WaterSupplyManagement
+ * Where are preformed most important functions related to the system (metrics and reliability)
+ * Stores a network graph and some unordered maps to help find the information related to each vertex.
+ */
 public:
     WaterSupplyManagement()= default;
     //data readers
