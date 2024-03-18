@@ -57,6 +57,10 @@ public:
     //EdmundsKarp
     void edmondsKarp(Graph<std::string> *g, std::string source, std::string target);
 
+    //Basic metrics
+    double flowDeficit(std::string cityCode );
+
+
     static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);
 private:
     Graph<std::string> network;

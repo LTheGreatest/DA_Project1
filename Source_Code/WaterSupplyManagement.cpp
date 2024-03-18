@@ -411,7 +411,7 @@ bool findAugmentingPath(Graph<string> *g, Vertex<string> *s, Vertex<string> *t) 
 
 // Function to find the minimum residual capacity along the augmenting path
 double findMinResidualAlongPath(Vertex<string> *s, Vertex<string> *t) {
-    double f = LONG_LONG_MIN;
+    double f = LONG_LONG_MAX;
 // Traverse the augmenting path to find the minimum residual capacity
     for (auto v = t; v != s; ) {
         auto e = v->getPath();
@@ -464,6 +464,19 @@ void WaterSupplyManagement::edmondsKarp(Graph<string> *g, string source, string 
         double f = findMinResidualAlongPath(s, t);
         augmentFlowAlongPath(s, t, f);
     }
+}
+
+//Basic Metrics =====================================================================================
+
+double WaterSupplyManagement::flowDeficit(std::string cityCode) {
+    Vertex<string> *cityVertex = network.findVertex(cityCode);
+    double deficit = codeToCity.find(cityCode)->second.getDemand();
+
+    for(auto inc: cityVertex->getIncoming()){
+        deficit -= inc->getFlow();
+    }
+
+    return deficit;
 }
 
 
