@@ -158,6 +158,7 @@ Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double w) {
     auto newEdge = new Edge<T>(this, d, w);
     adj.push_back(newEdge);
     d->incoming.push_back(newEdge);
+    d->setIndegree(d->getIndegree() + 1);
     return newEdge;
 }
 

@@ -46,8 +46,16 @@ public:
     std::unordered_map<std::string, Reservoir> getCodeToReservoir() const;
     std::unordered_map<std::string, Station> getCodeToStation() const;
     std::unordered_map<std::string, City> getCodeToCity() const;
-
     Graph<std::string> getNetwork() const;
+
+    //super nodes
+    void createSuperSource();
+    void createSuperSink();
+    void removeSuperSource();
+    void removeSuperSink();
+
+    //EdmundsKarp
+    void edmondsKarp(Graph<std::string> *g, std::string source, std::string target);
 
     static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);
 private:

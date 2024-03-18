@@ -9,7 +9,9 @@ enum class VertexType{
     RESERVOIR,
     STATIONS,
     CITIES,
-    PIPE
+    PIPE,
+    SUPERSINK,
+    SUPERSOURCE
 };
 
 #endif //PROJECT1_VERTEXTYPE_H

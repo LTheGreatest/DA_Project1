@@ -119,4 +119,84 @@ TEST(data_readers, readStationsBig){
     EXPECT_EQ(testSystem.getCodeToStation().size(), 81);
 }
 
+TEST(data_insert, insertAll){
+    cleanSystem();
 
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    EXPECT_EQ(testSystem.getNetwork().getVertexSet().size(), 26);
+
+}
+
+TEST(data_readers, readPipes){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+
+    testSystem.readPipes(DataSetSelection::SMALL);
+
+    auto size = 0;
+
+    for(Vertex<std::string> *vertex: testSystem.getNetwork().getVertexSet()){
+        size += vertex->getAdj().size();
+    }
+
+    EXPECT_EQ(size, 51);
+
+    Vertex<std::string> *v1 = testSystem.getNetwork().findVertex("R_1");
+    Vertex<std::string> *v2 = testSystem.getNetwork().findVertex("PS_3");
+    Vertex<std::string> *v3 = testSystem.getNetwork().findVertex("PS_4");
+
+    for(auto e: v1->getAdj()){
+        if(e->getDest()->getInfo() == "PS_1"){
+            EXPECT_EQ(e->getWeight(), 100);
+        }
+    }
+
+    for(auto e : v2->getAdj()){
+        if(e->getDest()->getInfo() == "PS_4"){
+            EXPECT_EQ(e->getWeight(), 250);
+        }
+    }
+
+    for(auto e : v3->getAdj()){
+        if(e->getDest()->getInfo() == "PS_3"){
+            EXPECT_EQ(e->getWeight(), 250);
+        }
+    }
+}
+
+TEST(createSuper, createSuperSource){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+
+    testSystem.readPipes(DataSetSelection::SMALL);
+
+    testSystem.createSuperSource();
+    Vertex<std::string> *superSource = testSystem.getNetwork().findVertex("super_source");
+    EXPECT_EQ(superSource->getAdj().size(), 4);
+}
+
+TEST(createSuper, createSuperSink){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+
+    testSystem.readPipes(DataSetSelection::SMALL);
+
+    testSystem.createSuperSink();
+    Vertex<std::string> *superSource = testSystem.getNetwork().findVertex("super_sink");
+    EXPECT_EQ(superSource->getIncoming().size(), 10);
+}
