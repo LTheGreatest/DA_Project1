@@ -30,9 +30,9 @@ public:
     void readPipes(DataSetSelection dataset);
 
     //data inserts and deletes (to help filter the network)
-    bool insertReservoir(std::string code);
-    bool insertStation(std::string code);
-    bool insertCity(std::string code);
+    bool insertReservoir(const std::string& code);
+    bool insertStation(const std::string& code);
+    bool insertCity(const std::string& code);
     void insertAll();
     bool deletePipe(const std::string &source, const std::string &dest);
 
@@ -55,10 +55,10 @@ public:
     void removeSuperSink();
 
     //EdmundsKarp
-    void edmondsKarp(Graph<std::string> *g, std::string source, std::string target);
+    void edmondsKarp(const std::string& source, const std::string& target);
 
     //Basic metrics
-    double flowDeficit(std::string cityCode );
+    double flowDeficit(const std::string& cityCode );
 
 
     static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);

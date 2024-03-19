@@ -9,11 +9,21 @@
 using namespace std;
 
 //Getters ============================================================================================
-
+/**
+ * Gets the water network/graph.
+ * Complexity: O(1)
+ * @return Water graph/network
+ */
 Graph<std::string> WaterSupplyManagement::getNetwork() const {
     return network;
 }
 
+/**
+ * Gets a city with a specific code. If it doesn't exist return nullptr.
+ * Complexity: O(1)
+ * @param code Code of the city
+ * @param city City that is returned
+ */
 void WaterSupplyManagement::getCity(const std::string& code, City* city) const{
     auto search  = codeToCity.find(code);
 
@@ -22,6 +32,12 @@ void WaterSupplyManagement::getCity(const std::string& code, City* city) const{
     }
 }
 
+/**
+ * Gets a reservoir with a specific code. If it doesn't exist return nullptr.
+ * Complexity: O(1)
+ * @param code Code of the reservoir
+ * @param reservoir Reservoir that is returned
+ */
 void WaterSupplyManagement::getReservoir(const std::string& code, Reservoir *reservoir) const {
     auto search = codeToReservoir.find(code);
 
@@ -30,6 +46,12 @@ void WaterSupplyManagement::getReservoir(const std::string& code, Reservoir *res
     }
 }
 
+/**
+ * Gets a station with a specific code. If it doesn't exist return nullptr.
+ * Complexity: O(1)
+ * @param code Code of the station
+ * @param station Station that is returned
+ */
 void WaterSupplyManagement::getStation(const std::string& code, Station *station) const {
     auto search = codeToStation.find(code);
 
@@ -38,18 +60,40 @@ void WaterSupplyManagement::getStation(const std::string& code, Station *station
     }
 }
 
+/**
+ * Gets the hashmap with the code to reservoir information.
+ * Complexity: O(1)
+ * @return  code to reservoir hashmap
+ */
 unordered_map<std::string, Reservoir> WaterSupplyManagement::getCodeToReservoir() const {
     return codeToReservoir;
 }
 
+/**
+ * Gets the hashmap with the code to station information.
+ * Complexity: O(1)
+ * @return code to station hashmap
+ */
 unordered_map<std::string, Station> WaterSupplyManagement::getCodeToStation() const {
     return codeToStation;
 }
 
+/**
+ * Gets the hashmap with the code to city information.
+ * Complexity: O(1)
+ * @return code to city hashmap
+ */
 unordered_map<std::string, City> WaterSupplyManagement::getCodeToCity() const {
     return codeToCity;
 }
 
+/**
+ * Used to select the path to the desired dataset.
+ * Complexity: O(1)
+ * @param dataset Which dataset we want (Big/Small)
+ * @param type  What type of vertex we want to obtain the path to it's data file
+ * @param filepath Path to the file
+ */
 void WaterSupplyManagement::selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath) {
     switch (dataset) {
         case DataSetSelection::SMALL:
@@ -276,7 +320,13 @@ void WaterSupplyManagement::readPipes(DataSetSelection dataset) {
 
 //Data insertion ================================================================================================
 
-bool WaterSupplyManagement::insertReservoir(string code) {
+/**
+ * Inserts a reservoir in the network.
+ * Complexity: O(n)
+ * @param code Code of the reservoir
+ * @return False if the reservoir already exists. True otherwise.
+ */
+bool WaterSupplyManagement::insertReservoir(const string& code) {
     Vertex<string> *reservoir = network.findVertex(code);
 
     if(reservoir != nullptr){
@@ -288,7 +338,13 @@ bool WaterSupplyManagement::insertReservoir(string code) {
     return true;
 }
 
-bool WaterSupplyManagement::insertStation(std::string code) {
+/**
+ * Inserts a station in the network.
+ * Complexity: O(n)
+ * @param code Code of the station
+ * @return False if the reservoir already exists. True otherwise.
+ */
+bool WaterSupplyManagement::insertStation(const std::string& code) {
     Vertex<string> *station = network.findVertex(code);
 
     if(station != nullptr){
@@ -300,7 +356,13 @@ bool WaterSupplyManagement::insertStation(std::string code) {
     return true;
 }
 
-bool WaterSupplyManagement::insertCity(std::string code) {
+/**
+ * Inserts a city in the network.
+ * Complexity: O(n)
+ * @param code Code of the city
+ * @return False if the city already exists. True otherwise.
+ */
+bool WaterSupplyManagement::insertCity(const std::string& code) {
     Vertex<string> *city = network.findVertex(code);
 
     if(city != nullptr){
@@ -312,6 +374,10 @@ bool WaterSupplyManagement::insertCity(std::string code) {
     return true;
 }
 
+/**
+ * Inserts all the reservoirs, cities and stations already stored in the hashmaps into the graph
+ * Complexity: O(n^2)
+ */
 void WaterSupplyManagement::insertAll() {
 
     //insert cities
@@ -331,18 +397,33 @@ void WaterSupplyManagement::insertAll() {
 }
 
 //Deletes =============================================================================
+/**
+ * Deletes a pipe in the network.
+ * Complexity: O(n)
+ * @param source Source vertex
+ * @param dest  Destination vertex
+ * @return  True if the removal was successful, false otherwise
+ */
 bool WaterSupplyManagement::deletePipe(const std::string &source, const std::string &dest) {
     return network.removeEdge(source, dest);
 }
 
 //Reset ===============================================================================
+/**
+ * Resets the system completely (nodes and edges).
+ * Complexity: O(1)
+ */
 void WaterSupplyManagement::resetSystem() {
     Graph<string> newSystem;
     network = newSystem;
 }
 
-//super nodes
+//super nodes ========================================================
 
+/**
+ * Creates a super source that connects all the sources(reservoirs) into a single source.
+ * Complexity: O(n^2)
+ */
 void WaterSupplyManagement::createSuperSource() {
     network.addVertex("super_source", VertexType::SUPERSOURCE);
 
@@ -351,6 +432,10 @@ void WaterSupplyManagement::createSuperSource() {
     }
 }
 
+/**
+ * Creates a super sinks that connects all the sinks(cities) into a single sink.
+ * Complexity: O(n^2)
+ */
 void WaterSupplyManagement::createSuperSink() {
     network.addVertex("super_sink", VertexType::SUPERSINK);
 
@@ -359,17 +444,31 @@ void WaterSupplyManagement::createSuperSink() {
     }
 }
 
+/**
+ * Removes the super source.
+ * Complexity: O(n)
+ */
 void WaterSupplyManagement::removeSuperSource() {
     network.removeVertex("super_source");
 }
 
+/**
+ * Removes the super sink.
+ * Complexity: O(n)
+ */
 void WaterSupplyManagement::removeSuperSink() {
     network.removeVertex("super_sink");
 }
 
 //Edmunds Karp==============================================================================================================
 
-// Function to test the given vertex 'w' and visit it if conditions are met
+/** Function to test the given vertex 'w' and visit it if conditions are met.
+ *
+ * @param q
+ * @param e
+ * @param w
+ * @param residual
+ */
 void testAndVisit(std::queue< Vertex<string>*> &q, Edge<string> *e, Vertex<string> *w, double residual) {
 // Check if the vertex 'w' is not visited and there is residual capacity
     if (! w->isVisited() && residual > 0) {
@@ -380,7 +479,13 @@ void testAndVisit(std::queue< Vertex<string>*> &q, Edge<string> *e, Vertex<strin
     }
 }
 
-// Function to find an augmenting path using Breadth-First Search
+/** Function to find an augmenting path using Breadth-First Search
+ *
+ * @param g
+ * @param s
+ * @param t
+ * @return
+ */
 bool findAugmentingPath(Graph<string> *g, Vertex<string> *s, Vertex<string> *t) {
 // Mark all vertices as not visited
     for(auto v : g->getVertexSet()) {
@@ -409,7 +514,12 @@ bool findAugmentingPath(Graph<string> *g, Vertex<string> *s, Vertex<string> *t) 
 
 
 
-// Function to find the minimum residual capacity along the augmenting path
+/** Function to find the minimum residual capacity along the augmenting path
+ *
+ * @param s
+ * @param t
+ * @return
+ */
 double findMinResidualAlongPath(Vertex<string> *s, Vertex<string> *t) {
     double f = LONG_LONG_MAX;
 // Traverse the augmenting path to find the minimum residual capacity
@@ -428,7 +538,12 @@ double findMinResidualAlongPath(Vertex<string> *s, Vertex<string> *t) {
     return f;
 }
 
-// Function to augment flow along the augmenting path with the given flow value
+/** Function to augment flow along the augmenting path with the given flow value
+ *
+ * @param s
+ * @param t
+ * @param f
+ */
 void augmentFlowAlongPath(Vertex<string> *s, Vertex<string> *t, double f) {
 // Traverse the augmenting path and update the flow values accordingly
     for (auto v = t; v != s; ) {
@@ -445,30 +560,39 @@ void augmentFlowAlongPath(Vertex<string> *s, Vertex<string> *t, double f) {
     }
 }
 
-
-void WaterSupplyManagement::edmondsKarp(Graph<string> *g, string source, string target) {
-// Find source and target vertices in the graph
-    Vertex<string>* s = g->findVertex(source);
-    Vertex<string>* t = g->findVertex(target);
-// Validate source and target vertices
+/**
+ *
+ * @param source
+ * @param target
+ */
+void WaterSupplyManagement::edmondsKarp(const string& source, const string& target) {
+    // Find source and target vertices in the graph
+    Vertex<string>* s = network.findVertex(source);
+    Vertex<string>* t = network.findVertex(target);
+    // Validate source and target vertices
     if (s == nullptr || t == nullptr || s == t)
         throw std::logic_error("Invalid source and/or target vertex");
-// Initialize flow on all edges to 0
-    for (auto v : g->getVertexSet()) {
+    // Initialize flow on all edges to 0
+    for (auto v : network.getVertexSet()) {
         for (auto e: v->getAdj()) {
             e->setFlow(0);
         }
     }
-// While there is an augmenting path, augment the flow along the path
-    while( findAugmentingPath(g, s, t) ) {
+    // While there is an augmenting path, augment the flow along the path
+    while( findAugmentingPath(&network, s, t) ) {
         double f = findMinResidualAlongPath(s, t);
         augmentFlowAlongPath(s, t, f);
     }
 }
 
 //Basic Metrics =====================================================================================
-
-double WaterSupplyManagement::flowDeficit(std::string cityCode) {
+/**
+ * Calculates the flow deficit in a given city.
+ * Complexity: O(n)
+ * @param cityCode City we want to analise the flow deficit
+ * @return The deficit value
+ */
+double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
     Vertex<string> *cityVertex = network.findVertex(cityCode);
     double deficit = codeToCity.find(cityCode)->second.getDemand();
 

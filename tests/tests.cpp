@@ -200,3 +200,26 @@ TEST(createSuper, createSuperSink){
     Vertex<std::string> *superSource = testSystem.getNetwork().findVertex("super_sink");
     EXPECT_EQ(superSource->getIncoming().size(), 10);
 }
+
+TEST(edmundsKarp, edmundsKarp){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::BIG);
+    testSystem.readReservoirs(DataSetSelection::BIG);
+    testSystem.readCities(DataSetSelection::BIG);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::BIG);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    for(std::pair<std::string, City> codeCity : testSystem.getCodeToCity()){
+        Vertex<std::string> *cityVertex = testSystem.getNetwork().findVertex(codeCity.first);
+        double waterAmount = 0;
+        for(auto e: cityVertex->getIncoming()){
+            waterAmount += e->getFlow();
+        }
+        std::cout << "city: " << codeCity.second.getName() << " water: " << waterAmount << '\n';
+    }
+}
