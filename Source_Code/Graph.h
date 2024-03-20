@@ -149,9 +149,15 @@ void deleteMatrix(double **m, int n);
 
 template <class T>
 Vertex<T>::Vertex(T in, VertexType type_): info(in), type(type_) {}
-/*
+
+/**
  * Auxiliary function to add an outgoing edge to a vertex (this),
  * with a given destination vertex (d) and edge weight (w).
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param d Vertex of destination.
+ * @param w Weight of the edge
+ * @return Pointer to the edges created
  */
 template <class T>
 Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double w) {
@@ -162,10 +168,13 @@ Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double w) {
     return newEdge;
 }
 
-/*
+/**
  * Auxiliary function to remove an outgoing edge (with a given destination (d))
  * from a vertex (this).
- * Returns true if successful, and false if such edge does not exist.
+ * Complexity: O(E^2) where E is the number of outgoing edges of the source vertex / incoming edges of the destination vertex.
+ * @tparam T Type to the class
+ * @param in Information of the destination edge
+ * @return true if successful, and false if such edge does not exist.
  */
 template <class T>
 bool Vertex<T>::removeEdge(T in) {
@@ -186,8 +195,10 @@ bool Vertex<T>::removeEdge(T in) {
     return removedEdge;
 }
 
-/*
+/**
  * Auxiliary function to remove an outgoing edge of a vertex.
+ * Complexity: O(E^2) where E is the number of outgoing edges of the source vertex / incoming edges of the destination vertex.
+ * @tparam T Type of the class
  */
 template <class T>
 void Vertex<T>::removeOutgoingEdges() {
@@ -204,81 +215,177 @@ bool Vertex<T>::operator<(Vertex<T> & vertex) const {
     return this->dist < vertex.dist;
 }
 
+/**
+ * Gets the vertex's information.
+ * Complexity: O(1)
+ * @tparam T Type fo the class
+ * @return Vertex's information
+ */
 template <class T>
 T Vertex<T>::getInfo() const {
     return this->info;
 }
 
+/**
+ * Gets the vertex's type.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Vertex's type.
+ */
 template <class T>
 VertexType Vertex<T>::getType() const{
     return this->type;
 }
 
+/**
+ * Gets the vertex's outgoing edges list.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Vertex's outgoing edges list.
+ */
 template <class T>
 std::vector<Edge<T>*> Vertex<T>::getAdj() const {
     return this->adj;
 }
 
+/**
+ * Gets the vertex's visited state.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Vertex's visited state
+ */
 template <class T>
 bool Vertex<T>::isVisited() const {
     return this->visited;
 }
 
+/**
+ * Gets the vertex's processing state.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Vertex's processing state
+ */
 template <class T>
 bool Vertex<T>::isProcessing() const {
     return this->processing;
 }
 
+/**
+ * Gets the vertex's indegree.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Vertex's indegree.
+ */
 template <class T>
 unsigned int Vertex<T>::getIndegree() const {
     return this->indegree;
 }
 
+/**
+ * Gets the vertex's distance from a given vertex.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Vertex's distance
+ */
 template <class T>
 double Vertex<T>::getDist() const {
     return this->dist;
 }
 
+/**
+ * Gets the edge corresponding to a path.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Edge corresponding to a path.
+ */
 template <class T>
 Edge<T> *Vertex<T>::getPath() const {
     return this->path;
 }
 
+/**
+ * Gets the vertex's incoming edge list.
+ *  * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Vertex's incoming edge list.
+ */
 template <class T>
 std::vector<Edge<T> *> Vertex<T>::getIncoming() const {
     return this->incoming;
 }
 
+/**
+ * Sets the vertex's information.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param in New information for the vertex.
+ */
 template <class T>
 void Vertex<T>::setInfo(T in) {
     this->info = in;
 }
 
+/**
+ * Sets the vertex's visited state.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param visited New visited state for the vertex.
+ */
 template <class T>
 void Vertex<T>::setVisited(bool visited) {
     this->visited = visited;
 }
 
+/**
+ * Sets the vertex's processing state.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param processing New processing state for the vertex.
+ */
 template <class T>
 void Vertex<T>::setProcesssing(bool processing) {
     this->processing = processing;
 }
 
+/**
+ * Sets the vertex's indegree.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param indegree New indegree for the vertex.
+ */
 template <class T>
 void Vertex<T>::setIndegree(unsigned int indegree) {
     this->indegree = indegree;
 }
 
+/**
+ * Sets the vertex's distance to another vertex.
+ * Complexity: O(1)
+ * @tparam T Type fo the class.
+ * @param dist New distance value.
+ */
 template <class T>
 void Vertex<T>::setDist(double dist) {
     this->dist = dist;
 }
 
+/**
+ * Sets the vertex's path.
+ * Complexity: O(1)
+ * @tparam T Type fo the class.
+ * @param path New path.
+ */
 template <class T>
 void Vertex<T>::setPath(Edge<T> *path) {
     this->path = path;
 }
 
+/**
+ * Deletes a given edge from the incoming edges list.
+ * Complexity: O(E) where E is the number og incoming edges.
+ * @tparam T Type fo the class.
+ * @param edge edge we want to delete.
+ */
 template <class T>
 void Vertex<T>::deleteEdge(Edge<T> *edge) {
     Vertex<T> *dest = edge->getDest();

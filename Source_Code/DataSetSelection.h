@@ -4,7 +4,13 @@
 
 #ifndef PROJECT1_DATASETSELECTION_H
 #define PROJECT1_DATASETSELECTION_H
-
+/**
+ * @file DataSetSelection.h
+ * @brief Contains a enum class to help differentiate the small and big data sets
+ *
+ * \enum DataSetSelection
+ * Helps differentiate the small and big data sets
+ */
 enum class DataSetSelection{
     SMALL,
     BIG
