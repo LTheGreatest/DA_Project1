@@ -382,7 +382,7 @@ void Vertex<T>::setPath(Edge<T> *path) {
 
 /**
  * Deletes a given edge from the incoming edges list.
- * Complexity: O(E) where E is the number og incoming edges.
+ * Complexity: O(E) where E is the number of incoming edges.
  * @tparam T Type fo the class.
  * @param edge edge we want to delete.
  */
@@ -407,46 +407,99 @@ void Vertex<T>::deleteEdge(Edge<T> *edge) {
 template <class T>
 Edge<T>::Edge(Vertex<T> *orig, Vertex<T> *dest, double w): orig(orig), dest(dest), weight(w) {}
 
+/**
+ * Gets the edge's destination.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Destination Vertex
+ */
 template <class T>
 Vertex<T> * Edge<T>::getDest() const {
     return this->dest;
 }
 
+/**
+ * Gets the edge weight.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Weight value
+ */
 template <class T>
 double Edge<T>::getWeight() const {
     return this->weight;
 }
 
+/**
+ * Gets the origin of the edge
+ * @tparam T Type of the class
+ * @return Origin vertex
+ */
 template <class T>
 Vertex<T> * Edge<T>::getOrig() const {
     return this->orig;
 }
 
+/**
+ * Gets the reverse edge.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Reverse edge
+ */
 template <class T>
 Edge<T> *Edge<T>::getReverse() const {
     return this->reverse;
 }
 
+/**
+ * Gets the selected status.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return Returns the selected status
+ */
 template <class T>
 bool Edge<T>::isSelected() const {
     return this->selected;
 }
 
+/**
+ * Gets the edge flow.
+ * Complexity: O(1)
+ * @tparam T type of th class
+ * @return Edge flow
+ */
 template <class T>
 double Edge<T>::getFlow() const {
     return flow;
 }
 
+/**
+ * Sets the selected status.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param selected New selected status
+ */
 template <class T>
 void Edge<T>::setSelected(bool selected) {
     this->selected = selected;
 }
 
+/**
+ * Sets the reverse edge.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param reverse New reverse edge
+ */
 template <class T>
 void Edge<T>::setReverse(Edge<T> *reverse) {
     this->reverse = reverse;
 }
 
+/**
+ * Sets the flow value.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @param flow New flow value
+ */
 template <class T>
 void Edge<T>::setFlow(double flow) {
     this->flow = flow;
@@ -454,11 +507,23 @@ void Edge<T>::setFlow(double flow) {
 
 /********************** Graph  ****************************/
 
+/**
+ * Gets the number of vertexes.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return  Number of Vertexes
+ */
 template <class T>
 int Graph<T>::getNumVertex() const {
     return vertexSet.size();
 }
 
+/**
+ * Gets the vector with the vertexes.
+ * Complexity: O(1)
+ * @tparam T Type of the class
+ * @return  vector with the vertexes
+ */
 template <class T>
 std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
     return vertexSet;

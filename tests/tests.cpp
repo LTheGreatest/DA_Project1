@@ -223,3 +223,52 @@ TEST(edmundsKarp, edmundsKarp){
         std::cout << "city: " << codeCity.second.getName() << " water: " << waterAmount << '\n';
     }
 }
+
+TEST(graphResiliency, affectedCitiesReservoir){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    std::vector<std::string> previouslyAffected {"C_6"};
+    std::vector<std::string> res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
+
+    EXPECT_EQ(res.size(), 2);
+    EXPECT_EQ(testSystem.getNetwork().getVertexSet().size(), 28);
+    previouslyAffected = {"C_2"};
+    res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
+
+    EXPECT_EQ(res.size(), 3);
+}
+
+TEST(resets, vertexreset){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    std::vector<std::string> destination {"PS_4", "PS_6", "PS_7", "PS_9", "PS_10"};
+    std::vector<double> capacity {150, 100, 50, 100, 50};
+
+    std::vector<std::string> previouslyAffected {"C_6"};
+    testSystem.affectedCitiesReservoir("R_4",previouslyAffected);
+
+    Vertex<std::string> *v = testSystem.getNetwork().findVertex("R_4");
+
+    int i = 0;
+    for(Edge<std::string> *e: v->getAdj()){
+        EXPECT_EQ(e->getDest()->getInfo(), destination.at(i));
+        EXPECT_EQ(e->getWeight(), capacity.at(i));
+        i++;
+    }
+}

@@ -38,6 +38,7 @@ public:
 
     //System reset
     void resetSystem();
+    void restoreVertex(const std::string& code, VertexType type,  const std::vector<Edge<std::string>>& incomingEdges, const std::vector<Edge<std::string>>& outGoingEdges);
 
     //Getters
     void getCity(const std::string& code, City *city) const;
@@ -59,6 +60,9 @@ public:
 
     //Basic metrics
     double flowDeficit(const std::string& cityCode );
+
+    //Reliability and Sensitivity
+    std::vector<std::string> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::string> &previouslyAffected);
 
 
     static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);

@@ -463,11 +463,11 @@ void WaterSupplyManagement::removeSuperSink() {
 //Edmunds Karp==============================================================================================================
 
 /** Function to test the given vertex 'w' and visit it if conditions are met.
- *
- * @param q
- * @param e
- * @param w
- * @param residual
+ *  Complexity: O(1)
+ * @param q queue used in the BFS to find the augmenting path
+ * @param e edge used to set the path
+ * @param w vertex we are testing
+ * @param residual  Residual capacity of the edge.
  */
 void testAndVisit(std::queue< Vertex<string>*> &q, Edge<string> *e, Vertex<string> *w, double residual) {
 // Check if the vertex 'w' is not visited and there is residual capacity
@@ -480,11 +480,11 @@ void testAndVisit(std::queue< Vertex<string>*> &q, Edge<string> *e, Vertex<strin
 }
 
 /** Function to find an augmenting path using Breadth-First Search
- *
- * @param g
- * @param s
- * @param t
- * @return
+ *  Complexity: O(E) where E is the number of edges of the Graph
+ * @param g Graph where we are finding the augmenting path
+ * @param s Source of the search.
+ * @param t Target of the search.
+ * @return  True if a path was found and false otherwise.
  */
 bool findAugmentingPath(Graph<string> *g, Vertex<string> *s, Vertex<string> *t) {
 // Mark all vertices as not visited
@@ -515,10 +515,10 @@ bool findAugmentingPath(Graph<string> *g, Vertex<string> *s, Vertex<string> *t) 
 
 
 /** Function to find the minimum residual capacity along the augmenting path
- *
- * @param s
- * @param t
- * @return
+ *  Complexity: O(n) were n is the number of edges of the path.
+ * @param s Source of the path
+ * @param t Target of the path
+ * @return  The minimal residual capacity along the path
  */
 double findMinResidualAlongPath(Vertex<string> *s, Vertex<string> *t) {
     double f = LONG_LONG_MAX;
@@ -539,10 +539,10 @@ double findMinResidualAlongPath(Vertex<string> *s, Vertex<string> *t) {
 }
 
 /** Function to augment flow along the augmenting path with the given flow value
- *
- * @param s
- * @param t
- * @param f
+ *  Complexity: O(n) where n is the number of edges of the path
+ * @param s source of the path
+ * @param t target of the path
+ * @param f Value of the flow we are augmenting
  */
 void augmentFlowAlongPath(Vertex<string> *s, Vertex<string> *t, double f) {
 // Traverse the augmenting path and update the flow values accordingly
@@ -561,9 +561,10 @@ void augmentFlowAlongPath(Vertex<string> *s, Vertex<string> *t, double f) {
 }
 
 /**
- *
- * @param source
- * @param target
+ *Executes the Edmonds Karp algorithm.
+ * Complexity: O(V E^2)
+ * @param source Starting point of the algorithm(super source)
+ * @param target Finishing point of the algorithm(super sink)
  */
 void WaterSupplyManagement::edmondsKarp(const string& source, const string& target) {
     // Find source and target vertices in the graph
@@ -601,6 +602,77 @@ double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
     }
 
     return deficit;
+}
+
+
+//Reliability and Sensitivity =========================================================================
+
+void WaterSupplyManagement::restoreVertex(const string& code, VertexType type,  const vector<Edge<string>>& incomingEdges, const vector<Edge<string>>& outGoingEdges){
+    network.addVertex(code, type);
+    Vertex<string> *v = network.findVertex(code);
+
+    for(Edge<string> e: incomingEdges){
+        network.addEdge(e.getOrig()->getInfo(), code, e.getWeight());
+        for(Edge<string> *e2: v->getIncoming()){
+            if(e2->getOrig()->getInfo() == e.getOrig()->getInfo()) {
+                e2->setFlow(e.getFlow());
+                e2->setSelected(e.isSelected());
+            }
+        }
+    }
+
+    for(Edge<string> e: outGoingEdges){
+        network.addEdge(code, e.getDest()->getInfo(), e.getWeight());
+        for(Edge<string> *e2: v->getAdj()){
+            if(e2->getDest()->getInfo() == e.getDest()->getInfo()) {
+                e2->setFlow(e.getFlow());
+                e2->setSelected(e.isSelected());
+            }
+        }
+    }
+}
+/**
+ * Gets the Cities that were affected (water supply not being met) by removing a given reservoir.
+ * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
+ * @param reservoirCode Code of the reservoir to be removed
+ * @param previouslyAffected Vector with the code of the cities that were already with a water deficit before removing the reservoir
+ * @return  Code of the cities that were affected by the removal of the reservoir.
+ */
+vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& reservoirCode, vector<string> &previouslyAffected) {
+    vector<string> res;
+
+    //Values that will be used to restore the graph in the end
+    vector<Edge<string>> incomingEdges;
+    vector<Edge<string>> outGoingEdges;
+    Vertex<string> *v = network.findVertex(reservoirCode);
+    for(Edge<string> *e: v->getIncoming()){
+        incomingEdges.push_back(*e);
+    }
+    for(Edge<string> *e: v->getAdj()){
+        outGoingEdges.push_back(*e);
+    }
+
+    //Removes the reservoir temporarily from the network
+    network.removeVertex(reservoirCode);
+
+    //calculates the new flow (assumes that already exists a super_source and a super_sink)
+    edmondsKarp("super_source", "super_sink");
+
+    //verifies the cities with deficit and verifies if they were already with a deficit
+    for(pair<string, City> codeCity : codeToCity){
+        double deficit = flowDeficit(codeCity.first);
+        if(deficit > 0){
+            auto search = find(previouslyAffected.begin(), previouslyAffected.end(), codeCity.first);
+            if(search == previouslyAffected.end()){
+                res.push_back(codeCity.first);
+            }
+        }
+    }
+
+    //restores the previous format of the network
+    restoreVertex(reservoirCode, VertexType::RESERVOIR, incomingEdges, outGoingEdges);
+
+    return res;
 }
 
 
