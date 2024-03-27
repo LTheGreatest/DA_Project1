@@ -607,30 +607,6 @@ double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
 
 //Reliability and Sensitivity =========================================================================
 
-void WaterSupplyManagement::restoreVertex(const string& code, VertexType type,  const vector<Edge<string>>& incomingEdges, const vector<Edge<string>>& outGoingEdges){
-    network.addVertex(code, type);
-    Vertex<string> *v = network.findVertex(code);
-
-    for(Edge<string> e: incomingEdges){
-        network.addEdge(e.getOrig()->getInfo(), code, e.getWeight());
-        for(Edge<string> *e2: v->getIncoming()){
-            if(e2->getOrig()->getInfo() == e.getOrig()->getInfo()) {
-                e2->setFlow(e.getFlow());
-                e2->setSelected(e.isSelected());
-            }
-        }
-    }
-
-    for(Edge<string> e: outGoingEdges){
-        network.addEdge(code, e.getDest()->getInfo(), e.getWeight());
-        for(Edge<string> *e2: v->getAdj()){
-            if(e2->getDest()->getInfo() == e.getDest()->getInfo()) {
-                e2->setFlow(e.getFlow());
-                e2->setSelected(e.isSelected());
-            }
-        }
-    }
-}
 /**
  * Gets the Cities that were affected (water supply not being met) by removing a given reservoir.
  * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
@@ -642,18 +618,12 @@ vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& rese
     vector<string> res;
 
     //Values that will be used to restore the graph in the end
-    vector<Edge<string>> incomingEdges;
-    vector<Edge<string>> outGoingEdges;
+    vector<double> weights;
     Vertex<string> *v = network.findVertex(reservoirCode);
-    for(Edge<string> *e: v->getIncoming()){
-        incomingEdges.push_back(*e);
-    }
     for(Edge<string> *e: v->getAdj()){
-        outGoingEdges.push_back(*e);
+        weights.push_back(e->getWeight());
+        e->setWeight(0);
     }
-
-    //Removes the reservoir temporarily from the network
-    network.removeVertex(reservoirCode);
 
     //calculates the new flow (assumes that already exists a super_source and a super_sink)
     edmondsKarp("super_source", "super_sink");
@@ -669,8 +639,11 @@ vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& rese
         }
     }
 
-    //restores the previous format of the network
-    restoreVertex(reservoirCode, VertexType::RESERVOIR, incomingEdges, outGoingEdges);
+    int i = 0;
+    for(Edge<string> *e: v->getAdj()){
+        e->setWeight(weights.at(i));
+        i++;
+    }
 
     return res;
 }

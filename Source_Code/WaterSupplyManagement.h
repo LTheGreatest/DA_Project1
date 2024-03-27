@@ -38,7 +38,6 @@ public:
 
     //System reset
     void resetSystem();
-    void restoreVertex(const std::string& code, VertexType type,  const std::vector<Edge<std::string>>& incomingEdges, const std::vector<Edge<std::string>>& outGoingEdges);
 
     //Getters
     void getCity(const std::string& code, City *city) const;

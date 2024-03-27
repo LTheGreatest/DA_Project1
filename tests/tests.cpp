@@ -224,6 +224,65 @@ TEST(edmundsKarp, edmundsKarp){
     }
 }
 
+TEST(edmundsKarp, edmundsKarpPipes){
+    std::cout <<'\n' << "EdmundsKarpPipes" << '\n';
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    for(auto v: testSystem.getNetwork().getVertexSet()){
+        for(auto e: v->getAdj()){
+            std::cout << "pipe -> "  << e->getOrig()->getInfo() << " : "  << e->getDest()->getInfo() << "   " << e->getFlow() << '\n';
+        }
+    }
+}
+
+TEST(basicMetrics, deficit){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    double deficit1 = testSystem.flowDeficit("C_2");
+    double deficit2 = testSystem.flowDeficit("C_6");
+
+    double deficit3 = testSystem.flowDeficit("C_1");
+    double deficit4 = testSystem.flowDeficit("C_3");
+    double deficit5 = testSystem.flowDeficit("C_4");
+    double deficit6 = testSystem.flowDeficit("C_5");
+    double deficit7 = testSystem.flowDeficit("C_7");
+    double deficit8 = testSystem.flowDeficit("C_8");
+    double deficit9 = testSystem.flowDeficit("C_9");
+    double deficit10 = testSystem.flowDeficit("C_10");
+
+    EXPECT_EQ(deficit1, 0);
+    EXPECT_EQ(deficit2, 76);
+    EXPECT_EQ(deficit3, 0);
+    EXPECT_EQ(deficit4, 0);
+    EXPECT_EQ(deficit5, 0);
+    EXPECT_EQ(deficit6, 0);
+    EXPECT_EQ(deficit7, 0);
+    EXPECT_EQ(deficit8, 0);
+    EXPECT_EQ(deficit9, 0);
+    EXPECT_EQ(deficit10, 0);
+
+}
+
 TEST(graphResiliency, affectedCitiesReservoir){
     cleanSystem();
 
@@ -235,11 +294,14 @@ TEST(graphResiliency, affectedCitiesReservoir){
     testSystem.createSuperSource();
     testSystem.createSuperSink();
 
+    double w = testSystem.getNetwork().findVertex("R_4")->getAdj().at(0)->getWeight();
     std::vector<std::string> previouslyAffected {"C_6"};
     std::vector<std::string> res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
 
     EXPECT_EQ(res.size(), 2);
     EXPECT_EQ(testSystem.getNetwork().getVertexSet().size(), 28);
+    EXPECT_EQ(w,testSystem.getNetwork().findVertex("R_4")->getAdj().at(0)->getWeight() );
+    
     previouslyAffected = {"C_2"};
     res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
 
