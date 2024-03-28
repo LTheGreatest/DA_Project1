@@ -542,8 +542,11 @@ std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
     return vertexSet;
 }
 
-/*
+/**
  * Auxiliary function to find a vertex with a given content.
+ * Complexity: O(v) where v is the number of vertexes
+ * @param in Info of the vertex to find.
+ * @return Pointer to the vertex found or nullptr if the vertex doesn't exists.
  */
 template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
@@ -553,8 +556,11 @@ Vertex<T> * Graph<T>::findVertex(const T &in) const {
     return nullptr;
 }
 
-/*
+/**
  * Finds the index of the vertex with a given content.
+ * Complexity: O(v) where v is the number of vertexes
+ * @param in Info of the vertex to find.
+ * @return Index of the vertex or -1 if it doesn't exists
  */
 template <class T>
 int Graph<T>::findVertexIdx(const T &in) const {
@@ -563,9 +569,13 @@ int Graph<T>::findVertexIdx(const T &in) const {
             return i;
     return -1;
 }
-/*
+
+/**
  *  Adds a vertex with a given content or info (in) to a graph (this).
- *  Returns true if successful, and false if a vertex with that content already exists.
+ *  Complexity: O(v) where v is the number of vertexes in the graph.
+ *  @param in Info of the vertex.
+ *  @param type Type of hte new vertex.
+ *  @return true if successful, and false if a vertex with that content already exists.
  */
 template <class T>
 bool Graph<T>::addVertex(const T &in, VertexType type) {
@@ -575,10 +585,12 @@ bool Graph<T>::addVertex(const T &in, VertexType type) {
     return true;
 }
 
-/*
+/**
  *  Removes a vertex with a given content (in) from a graph (this), and
  *  all outgoing and incoming edges.
- *  Returns true if successful, and false if such vertex does not exist.
+ *  Complexity: O(v^2 + E^2) = O(v^2) where v is the number of vertexes and E is the number of edges.
+ *  @param in Info of the vertex to remove.
+ *  @return true if successful, and false if such vertex does not exist.
  */
 template <class T>
 bool Graph<T>::removeVertex(const T &in) {
@@ -597,10 +609,14 @@ bool Graph<T>::removeVertex(const T &in) {
     return false;
 }
 
-/*
+/**
  * Adds an edge to a graph (this), given the contents of the source and
  * destination vertices and the edge weight (w).
- * Returns true if successful, and false if the source or destination vertex does not exist.
+ * Complexity: O(v) where v is the number of vertexes in the graph.
+ * @param dest info of the vertex that is the destination of the edge
+ * @param sourc info of the vertex that is the source of the edge
+ * @param w weight of the new edge.
+ * @return true if successful, and false if the source or destination vertex does not exist.
  */
 template <class T>
 bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
@@ -612,10 +628,13 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
     return true;
 }
 
-/*
+/**
  * Removes an edge from a graph (this).
  * The edge is identified by the source (sourc) and destination (dest) contents.
- * Returns true if successful, and false if such edge does not exist.
+ * Complexity: O(E^2) where E is the number of edges.
+ * @param dest info of the vertex that is the destination of the edge
+ * @param sourc info of the vertex that is the source of the edge
+ * @return true if successful, and false if such edge does not exist.
  */
 template <class T>
 bool Graph<T>::removeEdge(const T &sourc, const T &dest) {

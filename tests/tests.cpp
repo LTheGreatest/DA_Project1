@@ -301,7 +301,7 @@ TEST(graphResiliency, affectedCitiesReservoir){
     EXPECT_EQ(res.size(), 2);
     EXPECT_EQ(testSystem.getNetwork().getVertexSet().size(), 28);
     EXPECT_EQ(w,testSystem.getNetwork().findVertex("R_4")->getAdj().at(0)->getWeight() );
-    
+
     previouslyAffected = {"C_2"};
     res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
 
