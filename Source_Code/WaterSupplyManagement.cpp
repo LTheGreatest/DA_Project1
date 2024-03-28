@@ -470,9 +470,9 @@ void WaterSupplyManagement::removeSuperSink() {
  * @param residual  Residual capacity of the edge.
  */
 void testAndVisit(std::queue< Vertex<string>*> &q, Edge<string> *e, Vertex<string> *w, double residual) {
-// Check if the vertex 'w' is not visited and there is residual capacity
+    // Check if the vertex 'w' is not visited and there is residual capacity
     if (! w->isVisited() && residual > 0) {
-// Mark 'w' as visited, set the path through which it was reached, and enqueue it
+    // Mark 'w' as visited, set the path through which it was reached, and enqueue it
         w->setVisited(true);
         w->setPath(e);
         q.push(w);
@@ -487,28 +487,28 @@ void testAndVisit(std::queue< Vertex<string>*> &q, Edge<string> *e, Vertex<strin
  * @return  True if a path was found and false otherwise.
  */
 bool findAugmentingPath(Graph<string> *g, Vertex<string> *s, Vertex<string> *t) {
-// Mark all vertices as not visited
+    // Mark all vertices as not visited
     for(auto v : g->getVertexSet()) {
         v->setVisited(false);
     }
-// Mark the source vertex as visited and enqueue it
+    // Mark the source vertex as visited and enqueue it
     s->setVisited(true);
     std::queue<Vertex<string> *> q;
     q.push(s);
-// BFS to find an augmenting path
+    // BFS to find an augmenting path
     while( ! q.empty() && ! t->isVisited()) {
         auto v = q.front();
         q.pop();
-// Process outgoing edges
+    // Process outgoing edges
         for(auto e: v->getAdj()) {
             testAndVisit(q, e, e->getDest(), e->getWeight() - e->getFlow());
         }
-// Process incoming edges
+    // Process incoming edges
         for(auto e: v->getIncoming()) {
             testAndVisit(q, e, e->getOrig(), e->getFlow());
         }
     }
-// Return true if a path to the target is found, false otherwise
+    // Return true if a path to the target is found, false otherwise
     return t->isVisited();
 }
 
@@ -522,7 +522,7 @@ bool findAugmentingPath(Graph<string> *g, Vertex<string> *s, Vertex<string> *t) 
  */
 double findMinResidualAlongPath(Vertex<string> *s, Vertex<string> *t) {
     double f = LONG_LONG_MAX;
-// Traverse the augmenting path to find the minimum residual capacity
+    // Traverse the augmenting path to find the minimum residual capacity
     for (auto v = t; v != s; ) {
         auto e = v->getPath();
         if (e->getDest() == v) {
@@ -534,7 +534,7 @@ double findMinResidualAlongPath(Vertex<string> *s, Vertex<string> *t) {
             v = e->getDest();
         }
     }
-// Return the minimum residual capacity
+    // Return the minimum residual capacity
     return f;
 }
 
@@ -639,6 +639,7 @@ vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& rese
         }
     }
 
+    //restores the Weights of the adj pipes
     int i = 0;
     for(Edge<string> *e: v->getAdj()){
         e->setWeight(weights.at(i));

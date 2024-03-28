@@ -645,6 +645,15 @@ bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
     return srcVertex->removeEdge(dest);
 }
 
+/**
+ * Adds a bidirectional edge.
+ * Complexity: O(V) where v is the number of vertexes.
+ * @tparam T Type of class
+ * @param sourc Source of the edge
+ * @param dest Destination of the edge
+ * @param w Weight of the edge
+ * @return False if one of the vertexes (source or destination) doesn't exists. True otherwise
+ */
 template <class T>
 bool Graph<T>::addBidirectionalEdge(const T &sourc, const T &dest, double w) {
     auto v1 = findVertex(sourc);
@@ -660,9 +669,10 @@ bool Graph<T>::addBidirectionalEdge(const T &sourc, const T &dest, double w) {
 
 /****************** DFS ********************/
 
-/*
+/**
  * Performs a depth-first search (dfs) traversal in a graph (this).
- * Returns a vector with the contents of the vertices by dfs order.
+ * Complexity: O(V + E)
+ * @return a vector with the contents of the vertices by dfs order.
  */
 template <class T>
 std::vector<T> Graph<T>::dfs() const {
@@ -675,9 +685,10 @@ std::vector<T> Graph<T>::dfs() const {
     return res;
 }
 
-/*
+/**
  * Performs a depth-first search (dfs) in a graph (this) from the source node.
- * Returns a vector with the contents of the vertices by dfs order.
+ * Complexity: O(V + E)
+ * @return a vector with the contents of the vertices by dfs order.
  */
 template <class T>
 std::vector<T> Graph<T>::dfs(const T & source) const {
@@ -697,9 +708,12 @@ std::vector<T> Graph<T>::dfs(const T & source) const {
     return res;
 }
 
-/*
+/**
  * Auxiliary function that visits a vertex (v) and its adjacent, recursively.
  * Updates a parameter with the list of visited node contents.
+ * Complexity: O(V + E)
+ * @param v vertex we are now visiting
+ * @param res vector with the vertex visited in DFS order
  */
 template <class T>
 void Graph<T>::dfsVisit(Vertex<T> *v, std::vector<T> & res) const {
@@ -714,10 +728,12 @@ void Graph<T>::dfsVisit(Vertex<T> *v, std::vector<T> & res) const {
 }
 
 /****************** BFS ********************/
-/*
+/**
  * Performs a breadth-first search (bfs) in a graph (this), starting
  * from the vertex with the given source contents (source).
- * Returns a vector with the contents of the vertices by bfs order.
+ * Complexity: O(V + E)
+ * @param source Info of the source vertex
+ * @return a vector with the contents of the vertices by bfs order.
  */
 template <class T>
 std::vector<T> Graph<T>::bfs(const T & source) const {
@@ -753,12 +769,13 @@ std::vector<T> Graph<T>::bfs(const T & source) const {
 }
 
 /****************** isDAG  ********************/
-/*
+/**
  * Performs a depth-first search in a graph (this), to determine if the graph
  * is acyclic (acyclic directed graph or DAG).
  * During the search, a cycle is found if an edge connects to a vertex
  * that is being processed in the stack of recursive calls (see theoretical classes).
- * Returns true if the graph is acyclic, and false otherwise.
+ * Complexity: O(V + E)
+ * @return true if the graph is acyclic, and false otherwise.
  */
 
 template <class T>
@@ -777,7 +794,9 @@ bool Graph<T>::isDAG() const {
 
 /**
  * Auxiliary function that visits a vertex (v) and its adjacent, recursively.
- * Returns false (not acyclic) if an edge to a vertex in the stack is found.
+ * Complexity: O(V + E)
+ * @param v vertex we are visiting
+ * @return false (not acyclic) if an edge to a vertex in the stack is found.
  */
 template <class T>
 bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
@@ -799,11 +818,10 @@ bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
 // Exercise 1: Topological Sorting
 //=============================================================================
 // TODO
-/*
+/**
  * Performs a topological sorting of the vertices of a graph (this).
- * Returns a vector with the contents of the vertices by topological order.
- * If the graph has cycles, returns an empty vector.
- * Follows the algorithm described in theoretical classes.
+ * Complexity: O(V + E)
+ * @return a vector with the contents of the vertices by topological order. If the graph has cycles, returns an empty vector.
  */
 
 template<class T>
