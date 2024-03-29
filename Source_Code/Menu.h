@@ -30,12 +30,22 @@ public:
     int waterDeficit();
     int networkRebalance();
 
+    //Reliability and Sensitivity to Failures
+
+    int affectCitiesReservoir(std::vector<std::string> &previouslyAffected);
+    int affectedCitiesStations(std::vector<std::string> &previouslyAffected);
+    int affectedCitiesPipes(std::vector<std::string> &previouslyAffected);
+
+
     //Submenus for data selection
     int dataSelection();
     int selectReservoirs();
     int selectCities();
     int selectStations();
     int deletePipes();
+
+    //auxiliary
+    std::vector<std::string> findAffectedCities();
 
     //auxiliary function to check the inputs
     int inputCheck(int &option, int min, int max);

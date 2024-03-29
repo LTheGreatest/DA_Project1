@@ -142,6 +142,17 @@ int Menu::basicMetrics() {
     }
 }
 
+
+vector<string> Menu::findAffectedCities(){
+    vector<string> res;
+    for(pair<string, City> codeCity : system.getCodeToCity()){
+        if(system.flowDeficit(codeCity.first) > 0){
+            res.push_back(codeCity.first);
+        }
+    }
+    return res;
+}
+
 int Menu::reliabilitySensivityFailure() {
     while(true){
         cout << "\n RELIABILITY AND SENSITIVITY TO FAILURES MENU \n";
@@ -161,8 +172,15 @@ int Menu::reliabilitySensivityFailure() {
         }
         cout << '\n';
 
+
+        system.createSuperSource();
+        system.createSuperSink();
+        system.edmondsKarp("super_source", "super_sink");
+        vector<string> affectedCities = findAffectedCities();
+
         switch(option){
             case 1:
+                affectCitiesReservoir(affectedCities);
                 break;
             case 2:
                 break;
@@ -242,6 +260,38 @@ int Menu::waterDeficit() {
     }
 
     return EXIT_SUCCESS;
+}
+
+int Menu::networkRebalance() {
+    return 0;
+}
+
+//Reliability and Sensitivity to Failures ===============================================================================
+
+int Menu::affectCitiesReservoir(vector<string> &previouslyAffected) {
+    cout << "\nInsert the Reservoir code you want to delete from the system\n";
+    string code;
+    cin >> code;
+
+    auto search = system.getCodeToReservoir().find(code);
+    if(search == system.getCodeToReservoir().end()){
+        cout << "This reservoir doesn't exists \n";
+        return EXIT_FAILURE;
+    }
+
+    vector<string> affectedCities = system.affectedCitiesReservoir(code, previouslyAffected);
+
+    cout << "Code, Name\n";
+
+    for(string code : affectedCities){
+        auto codeReservoir = system.getCodeToCity().find(code);
+
+        cout << code << ", " << codeReservoir->second.getName() << '\n';
+
+    }
+
+    return EXIT_SUCCESS;
+
 }
 
 //Menu data selection and parsing =======================================================================================
