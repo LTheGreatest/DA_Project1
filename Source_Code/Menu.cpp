@@ -58,6 +58,7 @@ int Menu::mainMenu() {
                 cout << "Error found\n";
                 return EXIT_FAILURE;
             }
+            isSystemReset = false;
         }
 
         cout << "Please insert the number corresponding to the option you want to select\n\n";
@@ -103,11 +104,68 @@ int Menu::mainMenu() {
 }
 
 int Menu::basicMetrics() {
-    return 0;
+    while (true){
+        cout << "\n BASIC METRICS MENU \n";
+
+        cout << "1.Maximum amount of water that can reach each or a specific city\n";
+        cout << "2.Water deficit \n";
+        cout << "3.Network Balance \n";
+        cout << "4.Exit the menu\n";
+
+        int s;
+        int option;
+
+        s = inputCheck(option, 1, 4);
+        if (s != 0) {
+            cout << "Error found\n";
+            return EXIT_FAILURE;
+        }
+        cout << '\n';
+
+        switch(option){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                return EXIT_SUCCESS;
+        }
+    }
 }
 
 int Menu::reliabilitySensivityFailure() {
-    return 0;
+    while(true){
+        cout << "\n RELIABILITY AND SENSITIVITY TO FAILURES MENU \n";
+
+        cout << "1.Delivery capacity of the network if one specific water RESERVOIR is out of commission \n";
+        cout << "2.Delivery capacity of the network if one specific water STATION is out of service \n";
+        cout << "3.PIPELINES, if ruptured, would make it impossible to deliver the desired amount of water to a given city \n";
+        cout << "4. Exit the menu\n";
+
+        int s;
+        int option;
+
+        s = inputCheck(option, 1, 4);
+        if (s != 0) {
+            cout << "Error found\n";
+            return EXIT_FAILURE;
+        }
+        cout << '\n';
+
+        switch(option){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                return EXIT_SUCCESS;
+        }
+
+    }
 }
 
 //Menu data selection and parsing =======================================================================================
@@ -132,16 +190,21 @@ int Menu::dataSelection() {
     system.readCities(DataSetSelection::BIG);
     system.readReservoirs(DataSetSelection::BIG);
     system.readStations(DataSetSelection::BIG);
+
     switch (option) {
         case 1:
+            //inserts all the data available
             system.insertAll();
             system.readPipes(DataSetSelection::BIG);
             break;
+
         case 2:
+            //inserts all the data manually (personalized by the user)
             selectCities();
             selectStations();
             selectReservoirs();
             system.readPipes(DataSetSelection::BIG);
+            deletePipes();
             break;
     }
 
