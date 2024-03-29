@@ -110,6 +110,203 @@ int Menu::reliabilitySensivityFailure() {
     return 0;
 }
 
+//Menu data selection and parsing =======================================================================================
+
 int Menu::dataSelection() {
-    return 0;
+    cout << "\n SELECT THE DATA YOU WANT TO INSERT INTO THE SYSTEM \n";
+    int s;
+
+    cout << "1.Insert all available data\n";
+    cout << "2.Insert personalized data\n";
+
+    int option;
+
+    s = inputCheck(option, 1, 2);
+    if (s != 0) {
+        cout << "Error found\n";
+        return EXIT_FAILURE;
+    }
+    cout << '\n';
+
+    system.resetSystem();
+    system.readCities(DataSetSelection::BIG);
+    system.readReservoirs(DataSetSelection::BIG);
+    system.readStations(DataSetSelection::BIG);
+    switch (option) {
+        case 1:
+            system.insertAll();
+            system.readPipes(DataSetSelection::BIG);
+            break;
+        case 2:
+            selectCities();
+            selectStations();
+            selectReservoirs();
+            system.readPipes(DataSetSelection::BIG);
+            break;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int Menu::selectReservoirs() {
+    while(true){
+        string code;
+        cout << "\n Write a reservoir code to insert into the system \n";
+        cin >> code;
+
+        auto search = system.getCodeToReservoir().find(code);
+        if(search == system.getCodeToReservoir().end()){
+            cout << "This code don't apply to any of the existent reservoirs! \n";
+        }
+        else{
+            bool s = system.insertReservoir(code);
+            if(!s){
+                cout << "This reservoir is already in the system!\n";
+            }
+        }
+
+        cout << "Do you want to continue inserting reservoirs ?\n";
+
+        cout << "1.Yes\n";
+        cout << "2.No\n";
+
+        int s;
+        int option;
+
+        s = inputCheck(option, 1, 2);
+        if (s != 0) {
+            cout << "Error found\n";
+            return EXIT_FAILURE;
+        }
+        cout << '\n';
+
+        switch (option) {
+            case 1:
+                break;
+            case 2:
+                return EXIT_SUCCESS;
+        }
+
+    }
+}
+
+int Menu::selectStations() {
+    while(true){
+        string code;
+        cout << "\n Write a station code to insert into the system \n";
+        cin >> code;
+
+        auto search = system.getCodeToStation().find(code);
+        if(search == system.getCodeToStation().end()){
+            cout << "This code don't apply to any of the existent station! \n";
+        }
+        else{
+            bool s = system.insertStation(code);
+            if(!s){
+                cout << "This station is already in the system!\n";
+            }
+        }
+
+        cout << "Do you want to continue inserting stations ?\n";
+
+        cout << "1.Yes\n";
+        cout << "2.No\n";
+
+        int s;
+        int option;
+
+        s = inputCheck(option, 1, 2);
+        if (s != 0) {
+            cout << "Error found\n";
+            return EXIT_FAILURE;
+        }
+        cout << '\n';
+
+        switch (option) {
+            case 1:
+                break;
+            case 2:
+                return EXIT_SUCCESS;
+        }
+
+    }
+}
+
+int Menu::selectCities() {
+    while(true){
+        string code;
+        cout << "\n Write a city code to insert into the system \n";
+        cin >> code;
+
+        auto search = system.getCodeToCity().find(code);
+        if(search == system.getCodeToCity().end()){
+            cout << "This code don't apply to any of the existent cities! \n";
+        }
+        else{
+            bool s = system.insertCity(code);
+            if(!s){
+                cout << "This city is already in the system!\n";
+            }
+        }
+
+        cout << "Do you want to continue inserting cities ?\n";
+
+        cout << "1.Yes\n";
+        cout << "2.No\n";
+
+        int s;
+        int option;
+
+        s = inputCheck(option, 1, 2);
+        if (s != 0) {
+            cout << "Error found\n";
+            return EXIT_FAILURE;
+        }
+        cout << '\n';
+
+        switch (option) {
+            case 1:
+                break;
+            case 2:
+                return EXIT_SUCCESS;
+        }
+
+    }
+}
+
+int Menu::deletePipes() {
+    while(true){
+        cout << "\n Do you want to delete any pipe that exists in your current system configuration? \n";
+
+        cout << "1.Yes\n";
+        cout << "2.No\n";
+
+        int s;
+        int option;
+
+        s = inputCheck(option, 1, 2);
+        if (s != 0) {
+            cout << "Error found\n";
+            return EXIT_FAILURE;
+        }
+        cout << '\n';
+
+        switch (option) {
+            case 1:
+                break;
+            case 2:
+                return EXIT_SUCCESS;
+        }
+
+        cout << "\n Insert the code of the source of the pipe \n";
+        string source;
+        cin >> source;
+        cout << "\n Insert the code of the destination of the pipe \n";
+        string destination;
+        cin >> destination;
+
+        if(!system.deletePipe(source, destination)){
+            cout << "\n This pipe doesn't exists \n";
+        }
+    }
 }
