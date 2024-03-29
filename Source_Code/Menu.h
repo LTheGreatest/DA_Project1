@@ -25,6 +25,11 @@ public:
     int basicMetrics();
     int reliabilitySensivityFailure();
 
+    //Basic metrics
+    int maxWater();
+    int waterDeficit();
+    int networkRebalance();
+
     //Submenus for data selection
     int dataSelection();
     int selectReservoirs();

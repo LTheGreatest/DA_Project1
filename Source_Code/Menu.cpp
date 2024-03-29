@@ -122,8 +122,14 @@ int Menu::basicMetrics() {
         }
         cout << '\n';
 
+        //prepares the system to execute the metrics
+        system.createSuperSource();
+        system.createSuperSink();
+        system.edmondsKarp("super_source", "super_sink");
+
         switch(option){
             case 1:
+                maxWater();
                 break;
             case 2:
                 break;
@@ -142,7 +148,7 @@ int Menu::reliabilitySensivityFailure() {
         cout << "1.Delivery capacity of the network if one specific water RESERVOIR is out of commission \n";
         cout << "2.Delivery capacity of the network if one specific water STATION is out of service \n";
         cout << "3.PIPELINES, if ruptured, would make it impossible to deliver the desired amount of water to a given city \n";
-        cout << "4. Exit the menu\n";
+        cout << "4.Exit the menu\n";
 
         int s;
         int option;
@@ -166,6 +172,62 @@ int Menu::reliabilitySensivityFailure() {
         }
 
     }
+}
+
+//Basic metrics =========================================================================================================
+
+int Menu::maxWater() {
+    cout << "Do you want to select a specific city?\n";
+
+    cout << "1.Yes\n";
+    cout << "2.No\n";
+
+    int s;
+    int option;
+
+    s = inputCheck(option, 1, 2);
+    if (s != 0) {
+        cout << "Error found\n";
+        return EXIT_FAILURE;
+    }
+    cout << '\n';
+
+    double waterFlow;
+    string code;
+    Vertex<string> *v;
+    switch(option){
+        case 1:
+            cout << "\nInsert the code of the city \n";
+            cin >> code;
+            v = system.getNetwork().findVertex(code);
+            if(v == nullptr){
+                cout << "\nCity doesn't exists\n";
+                break;
+            }
+            waterFlow = 0;
+            for(Edge<string> *e: v->getIncoming()){
+                waterFlow += e->getFlow();
+            }
+            cout << "\nCode, Name, Water Amount \n";
+            cout << code << ", " << system.getCodeToCity().find(code)->second.getName() << ", " << waterFlow << "\n";
+            break;
+            
+        case 2:
+            cout << "\nCode, Name, Water Amount \n";
+            for(pair<string, City> codeCity : system.getCodeToCity()){
+                v = system.getNetwork().findVertex(codeCity.first);
+                waterFlow = 0;
+                for(Edge<string> *e: v->getIncoming()){
+                    waterFlow += e->getFlow();
+                }
+
+                cout << codeCity.first << ", " << codeCity.second.getName() << ", " << waterFlow << "\n";
+            }
+            break;
+    }
+
+    return EXIT_SUCCESS;
+
 }
 
 //Menu data selection and parsing =======================================================================================
@@ -373,3 +435,5 @@ int Menu::deletePipes() {
         }
     }
 }
+
+

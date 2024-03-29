@@ -425,10 +425,11 @@ void WaterSupplyManagement::resetSystem() {
  * Complexity: O(n^2)
  */
 void WaterSupplyManagement::createSuperSource() {
-    network.addVertex("super_source", VertexType::SUPERSOURCE);
+    if(network.addVertex("super_source", VertexType::SUPERSOURCE)) {
 
-    for(pair<string, Reservoir> codeReservoir: codeToReservoir){
-        network.addEdge("super_source", codeReservoir.first, codeReservoir.second.getReservoirMaxDelivery());
+        for (pair<string, Reservoir> codeReservoir: codeToReservoir) {
+            network.addEdge("super_source", codeReservoir.first, codeReservoir.second.getReservoirMaxDelivery());
+        }
     }
 }
 
@@ -437,10 +438,11 @@ void WaterSupplyManagement::createSuperSource() {
  * Complexity: O(n^2)
  */
 void WaterSupplyManagement::createSuperSink() {
-    network.addVertex("super_sink", VertexType::SUPERSINK);
+    if(network.addVertex("super_sink", VertexType::SUPERSINK)) {
 
-    for(pair<string, City> codeCity: codeToCity){
-        network.addEdge(codeCity.first, "super_sink", codeCity.second.getDemand());
+        for (pair<string, City> codeCity: codeToCity) {
+            network.addEdge(codeCity.first, "super_sink", codeCity.second.getDemand());
+        }
     }
 }
 
