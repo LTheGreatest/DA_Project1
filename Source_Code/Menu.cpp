@@ -132,6 +132,7 @@ int Menu::basicMetrics() {
                 maxWater();
                 break;
             case 2:
+                waterDeficit();
                 break;
             case 3:
                 break;
@@ -211,7 +212,7 @@ int Menu::maxWater() {
             cout << "\nCode, Name, Water Amount \n";
             cout << code << ", " << system.getCodeToCity().find(code)->second.getName() << ", " << waterFlow << "\n";
             break;
-            
+
         case 2:
             cout << "\nCode, Name, Water Amount \n";
             for(pair<string, City> codeCity : system.getCodeToCity()){
@@ -228,6 +229,19 @@ int Menu::maxWater() {
 
     return EXIT_SUCCESS;
 
+}
+
+int Menu::waterDeficit() {
+    cout << "\nCode , Name,  Water deficit\n";
+    double deficit = 0;
+    for(pair<string, City> codeCity : system.getCodeToCity()){
+        deficit = system.flowDeficit(codeCity.first);
+        if(deficit > 0){
+            cout << codeCity.first << ", " << codeCity.second.getName() << ", " << deficit << '\n';
+        }
+    }
+
+    return EXIT_SUCCESS;
 }
 
 //Menu data selection and parsing =======================================================================================
