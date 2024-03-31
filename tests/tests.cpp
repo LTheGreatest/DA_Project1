@@ -381,12 +381,16 @@ TEST(basicMetrics, rebalanceSmall){
     testSystem.edmondsKarp("super_source", "super_sink");
 
     double avgInitial = testSystem.avgDiffPipes();
+    double difInitial = testSystem.maxDiffPipes();
     testSystem.networkBalance();
     double avgFinal = testSystem.avgDiffPipes();
+    double difFinal = testSystem.maxDiffPipes();
 
-    std::cout << avgInitial << "   " << avgFinal;
+    std::cout << avgInitial << "   " << avgFinal << '\n';
+    std::cout << difInitial << "   " << difFinal << '\n';
 
     EXPECT_EQ(avgFinal < avgInitial, true);
+    EXPECT_EQ(difFinal <= difInitial, true);
 }
 
 TEST(basicMetrics, rebalanceBig){
@@ -403,10 +407,14 @@ TEST(basicMetrics, rebalanceBig){
     testSystem.edmondsKarp("super_source", "super_sink");
 
     double avgInitial = testSystem.avgDiffPipes();
+    double difInitial = testSystem.maxDiffPipes();
     testSystem.networkBalance();
     double avgFinal = testSystem.avgDiffPipes();
+    double difFinal = testSystem.maxDiffPipes();
 
-    std::cout << avgInitial << "   " << avgFinal;
+    std::cout << avgInitial << "   " << avgFinal << '\n';
+    std::cout << difInitial << "   " << difFinal << '\n';
 
     EXPECT_EQ(avgFinal < avgInitial, true);
+    EXPECT_EQ(difFinal <= difInitial, true);
 }

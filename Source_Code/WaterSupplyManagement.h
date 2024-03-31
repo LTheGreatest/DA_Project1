@@ -62,8 +62,8 @@ public:
     double maxDiffPipes();
 
     //auxiliary functions to balance the network
-    Edge<std::string> *edgeWithTheMaxDiff(std::vector<Edge<std::string>*> adj);
-    Edge<std::string> *edgeWithTheMinDiff(std::vector<Edge<std::string>*> adj);
+    Edge<std::string> *edgeWithTheMaxDiff(const std::vector<Edge<std::string>*>& adj);
+    Edge<std::string> *edgeWithTheMinDiff(const std::vector<Edge<std::string>*>& adj);
     void resetFlowChanges(Vertex<std::string> *v, int flow);
     bool flowAdd(Vertex<std::string> *v);
     bool flowSub(Vertex<std::string> *v);

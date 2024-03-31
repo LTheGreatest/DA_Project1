@@ -606,30 +606,18 @@ double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
     return deficit;
 }
 
-
-void WaterSupplyManagement::resetPath(){
-    for(Vertex<string> *v : network.getVertexSet()){
-        v->setPath(nullptr);
-    }
-}
-
-void WaterSupplyManagement::resetVisited() {
-    for(Vertex<string> *v : network.getVertexSet()){
-        v->setVisited(false);
-    }
-}
-
+/**
+ * Balances the network water flow in order to minimize the average difference between the pipe capacity and flow.
+ * Complexity: O(VE^2 D) where v is the number of vertexes, E is the number of edges and D is unknown (number of times the while loops runs, it depends on the balance of the original graph, worst case is exponential)
+ */
 void WaterSupplyManagement::networkBalance() {
     double Avg = avgDiffPipes();
-    double initialAvg = Avg;
-    double Diff = maxDiffPipes();
 
     resetPath();
     resetVisited();
 
     for(pair<string,Reservoir> codeR : codeToReservoir){
         Vertex<string> *v = network.findVertex(codeR.first);
-        int maxTries = initialAvg;
         if(v->getAdj().size() > 1) {
             while (true) {
 
@@ -655,7 +643,6 @@ void WaterSupplyManagement::networkBalance() {
                     break;
                 }
                 Avg = newAVG;
-                maxTries--;
             }
         }
     }
@@ -663,7 +650,6 @@ void WaterSupplyManagement::networkBalance() {
     //calculates the difference of the pipes that go from the stations
     for(pair<string,Station> codeS : codeToStation){
         Vertex<string> *v = network.findVertex(codeS.first);
-        int maxTries = initialAvg;
         if(v->getAdj().size() > 1) {
             while (true) {
 
@@ -673,6 +659,7 @@ void WaterSupplyManagement::networkBalance() {
                     break;
                 }
                 resetPath();
+                resetVisited();
 
                 //tries to find a path to add flow (biggest difference)
                 if (!flowAdd(v)) {
@@ -680,6 +667,7 @@ void WaterSupplyManagement::networkBalance() {
                     break;
                 }
                 resetPath();
+                resetVisited();
 
                 //calculates the new avg and verifies if it is better or worse than before
                 double newAVG = avgDiffPipes();
@@ -687,15 +675,19 @@ void WaterSupplyManagement::networkBalance() {
                     break;
                 }
                 Avg = newAVG;
-                maxTries--;
             }
         }
     }
 }
 
 
-//Auxiliary functions to balance the network
-
+//Auxiliary functions to balance the network ============================================================================
+/**
+ * Adds flow in pipes that have the biggest difference between capacity and flow.
+ * Complexity: O(E) where e is the number of edges.
+ * @param v Starting vertex (station or reservoir)
+ * @return True if we successfully find a path that can accept more flow and finishes into a sink (city). False, otherwise.
+ */
 bool WaterSupplyManagement::flowAdd(Vertex<std::string> *v) {
     Edge<string> *currentEdge;
     Vertex<string> *currentVertex = v;
@@ -720,6 +712,12 @@ bool WaterSupplyManagement::flowAdd(Vertex<std::string> *v) {
     return true;
 }
 
+/**
+ * Subtracts flow in pipes that have the lowest difference between capacity and flow.
+ * Complexity: O(E) where e is the number of edges.
+ * @param v Starting vertex (station or reservoir)
+ * @return True if we successfully find a path where we can subtract flow and finishes into a sink (city). False, otherwise.
+ */
 bool WaterSupplyManagement::flowSub(Vertex<std::string> *v) {
     Edge<string> *currentEdge;
     Vertex<string> *currentVertex = v;
@@ -746,6 +744,12 @@ bool WaterSupplyManagement::flowSub(Vertex<std::string> *v) {
     return true;
 }
 
+/**
+ * Resets the changes previously made when adding or subtracting flow.
+ * Complexity: O(E) where e is the number of edges.
+ * @param v Initial vertex
+ * @param flow Amount of flow to add
+ */
 void WaterSupplyManagement::resetFlowChanges(Vertex<std::string> *v, int flow) {
     Edge<string> *currentEdge;
     Vertex<string> *currentVertex = v;
@@ -767,7 +771,13 @@ void WaterSupplyManagement::resetFlowChanges(Vertex<std::string> *v, int flow) {
 
 }
 
-Edge<string>* WaterSupplyManagement::edgeWithTheMinDiff(std::vector<Edge<std::string> *> adj) {
+/**
+ * Finds the edge with the minimum difference in a selection of edges.
+ * Complexity: O(n) where n is size of the vector
+ * @param adj Selection of edges to analise
+ * @return edge with the minimum difference in a selection of edges.
+ */
+Edge<string>* WaterSupplyManagement::edgeWithTheMinDiff(const std::vector<Edge<std::string> *>& adj) {
     double diff = LONG_LONG_MAX;
     Edge<string>* res = nullptr;
 
@@ -781,7 +791,13 @@ Edge<string>* WaterSupplyManagement::edgeWithTheMinDiff(std::vector<Edge<std::st
     return res;
 }
 
-Edge<string>* WaterSupplyManagement::edgeWithTheMaxDiff(std::vector<Edge<std::string> *> adj) {
+/**
+ * Finds the edge with the maximum difference in a selection of edges.
+ * Complexity: O(n) where n is size of the vector
+ * @param adj Selection of edges to analise
+ * @return edge with the maximum difference in a selection of edges.
+ */
+Edge<string>* WaterSupplyManagement::edgeWithTheMaxDiff(const std::vector<Edge<std::string> *>& adj) {
     double diff = 0.0;
     Edge<string>* res = nullptr;
 
@@ -793,6 +809,26 @@ Edge<string>* WaterSupplyManagement::edgeWithTheMaxDiff(std::vector<Edge<std::st
     }
 
     return res;
+}
+
+/**
+ * Resets the path in all the vertexes in the graph
+ * Complexity: O(v) where v is the number of vertexes
+ */
+void WaterSupplyManagement::resetPath(){
+    for(Vertex<string> *v : network.getVertexSet()){
+        v->setPath(nullptr);
+    }
+}
+
+/**
+ * Resets the visited state in all the vertexes in the graph
+ * Complexity: O(v) where v is the number of vertexes
+ */
+void WaterSupplyManagement::resetVisited() {
+    for(Vertex<string> *v : network.getVertexSet()){
+        v->setVisited(false);
+    }
 }
 
 
