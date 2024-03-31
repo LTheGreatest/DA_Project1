@@ -334,3 +334,79 @@ TEST(resets, vertexreset){
         i++;
     }
 }
+
+TEST(auxiliaryMetrics, avgPipes){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    EXPECT_EQ(testSystem.avgDiffPipes() > 173, true);
+}
+
+TEST(auxiliaryMetrics, maxPipes){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    EXPECT_EQ(testSystem.maxDiffPipes(), 750.0);
+}
+
+TEST(basicMetrics, rebalanceSmall){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    double avgInitial = testSystem.avgDiffPipes();
+    testSystem.networkBalance();
+    double avgFinal = testSystem.avgDiffPipes();
+
+    std::cout << avgInitial << "   " << avgFinal;
+
+    EXPECT_EQ(avgFinal < avgInitial, true);
+}
+
+TEST(basicMetrics, rebalanceBig){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::BIG);
+    testSystem.readReservoirs(DataSetSelection::BIG);
+    testSystem.readCities(DataSetSelection::BIG);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::BIG);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    double avgInitial = testSystem.avgDiffPipes();
+    testSystem.networkBalance();
+    double avgFinal = testSystem.avgDiffPipes();
+
+    std::cout << avgInitial << "   " << avgFinal;
+
+    EXPECT_EQ(avgFinal < avgInitial, true);
+}

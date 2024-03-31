@@ -607,6 +607,195 @@ double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
 }
 
 
+void WaterSupplyManagement::resetPath(){
+    for(Vertex<string> *v : network.getVertexSet()){
+        v->setPath(nullptr);
+    }
+}
+
+void WaterSupplyManagement::resetVisited() {
+    for(Vertex<string> *v : network.getVertexSet()){
+        v->setVisited(false);
+    }
+}
+
+void WaterSupplyManagement::networkBalance() {
+    double Avg = avgDiffPipes();
+    double initialAvg = Avg;
+    double Diff = maxDiffPipes();
+
+    resetPath();
+    resetVisited();
+
+    for(pair<string,Reservoir> codeR : codeToReservoir){
+        Vertex<string> *v = network.findVertex(codeR.first);
+        int maxTries = initialAvg;
+        if(v->getAdj().size() > 1) {
+            while (true) {
+
+                //tries to find a path to subtract flow (smallest difference)
+                if (!flowSub(v)) {
+                    resetFlowChanges(v, 1);
+                    break;
+                }
+                resetPath();
+                resetVisited();
+
+                //tries to find a path to add flow (biggest difference)
+                if (!flowAdd(v)) {
+                    resetFlowChanges(v, -1);
+                    break;
+                }
+                resetPath();
+                resetVisited();
+
+                //calculates the new avg and verifies if it is better or worse than before
+                double newAVG = avgDiffPipes();
+                if(newAVG >= Avg){
+                    break;
+                }
+                Avg = newAVG;
+                maxTries--;
+            }
+        }
+    }
+
+    //calculates the difference of the pipes that go from the stations
+    for(pair<string,Station> codeS : codeToStation){
+        Vertex<string> *v = network.findVertex(codeS.first);
+        int maxTries = initialAvg;
+        if(v->getAdj().size() > 1) {
+            while (true) {
+
+                //tries to find a path to subtract flow (smallest difference)
+                if (!flowSub(v)) {
+                    resetFlowChanges(v, 1);
+                    break;
+                }
+                resetPath();
+
+                //tries to find a path to add flow (biggest difference)
+                if (!flowAdd(v)) {
+                    resetFlowChanges(v, -1);
+                    break;
+                }
+                resetPath();
+
+                //calculates the new avg and verifies if it is better or worse than before
+                double newAVG = avgDiffPipes();
+                if(newAVG >= Avg){
+                    break;
+                }
+                Avg = newAVG;
+                maxTries--;
+            }
+        }
+    }
+}
+
+
+//Auxiliary functions to balance the network
+
+bool WaterSupplyManagement::flowAdd(Vertex<std::string> *v) {
+    Edge<string> *currentEdge;
+    Vertex<string> *currentVertex = v;
+
+    while(currentVertex->getType() != VertexType::CITIES){
+
+        currentEdge = edgeWithTheMaxDiff(currentVertex->getAdj());
+
+        if(currentEdge == nullptr){
+            return false;
+        }
+
+        if(currentEdge->getWeight() - currentEdge->getFlow() == 0){
+            return false;
+        }
+
+        currentEdge->setFlow(currentEdge->getFlow() + 1);
+        currentVertex->setPath(currentEdge);
+        currentVertex = currentEdge->getDest();
+    }
+
+    return true;
+}
+
+bool WaterSupplyManagement::flowSub(Vertex<std::string> *v) {
+    Edge<string> *currentEdge;
+    Vertex<string> *currentVertex = v;
+
+    while(currentVertex->getType() != VertexType::CITIES){
+
+        currentEdge = edgeWithTheMinDiff(currentVertex->getAdj());
+
+
+        if(currentEdge == nullptr){
+            cout << "This should not happen\n";
+            return false;
+        }
+
+        if(currentEdge->getWeight() - currentEdge->getFlow() == currentEdge->getWeight()){
+            return false;
+        }
+
+        currentEdge->setFlow(currentEdge->getFlow() -1);
+        currentVertex->setPath(currentEdge);
+        currentVertex = currentEdge->getDest();
+    }
+
+    return true;
+}
+
+void WaterSupplyManagement::resetFlowChanges(Vertex<std::string> *v, int flow) {
+    Edge<string> *currentEdge;
+    Vertex<string> *currentVertex = v;
+
+    while(true){
+        currentEdge = currentVertex->getPath();
+        if (currentVertex->isVisited()){
+            break;
+        }
+
+        if(currentEdge == nullptr){
+            break;
+        }
+
+        currentEdge->setFlow(currentEdge->getFlow() + flow);
+        currentVertex->setVisited(true);
+        currentVertex = currentEdge->getDest();
+    }
+
+}
+
+Edge<string>* WaterSupplyManagement::edgeWithTheMinDiff(std::vector<Edge<std::string> *> adj) {
+    double diff = LONG_LONG_MAX;
+    Edge<string>* res = nullptr;
+
+    for(Edge<string> *e: adj){
+        if((e->getWeight() - e->getFlow()) < diff){
+            diff = e->getWeight() - e->getFlow();
+            res = e;
+        }
+    }
+
+    return res;
+}
+
+Edge<string>* WaterSupplyManagement::edgeWithTheMaxDiff(std::vector<Edge<std::string> *> adj) {
+    double diff = 0.0;
+    Edge<string>* res = nullptr;
+
+    for(Edge<string> *e: adj){
+        if((e->getWeight() - e->getFlow()) > diff){
+            diff = e->getWeight() - e->getFlow();
+            res = e;
+        }
+    }
+
+    return res;
+}
+
+
 //Reliability and Sensitivity =========================================================================
 
 /**
@@ -649,6 +838,71 @@ vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& rese
     }
 
     return res;
+}
+
+//auxiliary metrics ==================================================================================
+/**
+ * Calculates the average difference between the capacity and flow of each pipe.
+ * Complexity: O(VE) where v is the number of vertexes (except the cities) and E is the number of edges
+ * @return The average difference between the capacity and flow of each pipe
+ */
+double WaterSupplyManagement::avgDiffPipes() {
+    int numPipes = 0;
+    double sumDiff = 0.0;
+
+    //calculates the difference of the pipes that go from the reservoirs
+    for(pair<string,Reservoir> codeR : codeToReservoir){
+        Vertex<string> *v = network.findVertex(codeR.first);
+        for(Edge<string> *e : v->getAdj()){
+            numPipes++;
+            sumDiff += e->getWeight() - e->getFlow();
+        }
+    }
+
+    //calculates the difference of the pipes that go from the stations
+    for(pair<string,Station> codeS : codeToStation){
+        Vertex<string> *v = network.findVertex(codeS.first);
+        for(Edge<string> *e : v->getAdj()){
+            numPipes++;
+            sumDiff += e->getWeight() - e->getFlow();
+        }
+    }
+
+    double avg = sumDiff/numPipes;
+
+    return avg;
+
+}
+
+/**
+ * Calculates the maximum difference between the capacity and flow of each pipe.
+ * O(VE) where v is the number of vertexes (except the cities) and E is the number of edges
+ * @return maximum difference between the capacity and flow of each pipe
+ */
+double WaterSupplyManagement::maxDiffPipes() {
+    double maxDiff = 0.0;
+
+    //calculates the difference of the pipes that go from the reservoirs
+    for(pair<string,Reservoir> codeR : codeToReservoir){
+        Vertex<string> *v = network.findVertex(codeR.first);
+        for(Edge<string> *e : v->getAdj()){
+             if (e->getWeight() - e->getFlow() > maxDiff){
+                 maxDiff = e->getWeight() - e->getFlow();
+             }
+        }
+    }
+
+    //calculates the difference of the pipes that go from the stations
+    for(pair<string,Station> codeS : codeToStation){
+        Vertex<string> *v = network.findVertex(codeS.first);
+        for(Edge<string> *e : v->getAdj()){
+            if (e->getWeight() - e->getFlow() > maxDiff){
+                maxDiff = e->getWeight() - e->getFlow();
+            }
+        }
+    }
+
+    return maxDiff;
 }
 
 
