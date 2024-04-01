@@ -74,6 +74,7 @@ public:
     //Basic metrics
     double flowDeficit(const std::string& cityCode );
     void networkBalance();
+    void storeMetricsToFile();
 
     //Reliability and Sensitivity
     std::vector<std::string> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::string> &previouslyAffected);

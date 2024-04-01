@@ -110,12 +110,13 @@ int Menu::basicMetrics() {
         cout << "1.Maximum amount of water that can reach each or a specific city\n";
         cout << "2.Water deficit \n";
         cout << "3.Network Balance \n";
-        cout << "4.Exit the menu\n";
+        cout << "4.Store metrics to a file\n";
+        cout << "5.Exit the menu\n";
 
         int s;
         int option;
 
-        s = inputCheck(option, 1, 4);
+        s = inputCheck(option, 1, 5);
         if (s != 0) {
             cout << "Error found\n";
             return EXIT_FAILURE;
@@ -138,6 +139,10 @@ int Menu::basicMetrics() {
                 networkRebalance();
                 break;
             case 4:
+                cout << "\nThe metrics were stored in a file called metrics.csv\n";
+                system.storeMetricsToFile();
+                break;
+            case 5:
                 return EXIT_SUCCESS;
         }
     }

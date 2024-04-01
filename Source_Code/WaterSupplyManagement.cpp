@@ -611,6 +611,30 @@ double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
     return deficit;
 }
 
+void WaterSupplyManagement::storeMetricsToFile() {
+    ofstream fout;
+
+    fout.open("../Source_Code/metrics.csv");
+
+    fout << "Code, Received water, Name, Id, Population, Demand\n";
+
+    if(fout){
+        for(pair<string, City> codeCity : codeToCity){
+            Vertex<string> *v = network.findVertex(codeCity.first);
+            if(v == nullptr) continue;
+
+            fout << codeCity.first << ", ";
+            fout << v->getAdj().at(0)->getFlow() << ", ";
+            fout << codeCity.second.getName() << ", ";
+            fout << codeCity.second.getId() << ", ";
+            fout << codeCity.second.getPopulation() << ", ";
+            fout << codeCity.second.getDemand() << '\n';
+        }
+    }
+
+    fout.close();
+}
+
 /**
  * Balances the network water flow in order to minimize the average difference between the pipe capacity and flow.
  * Complexity: O(VE^2 D) where v is the number of vertexes, E is the number of edges and D is unknown (number of times the while loops runs, it depends on the balance of the original graph, worst case is exponential)
