@@ -135,6 +135,7 @@ int Menu::basicMetrics() {
                 waterDeficit();
                 break;
             case 3:
+                networkRebalance();
                 break;
             case 4:
                 return EXIT_SUCCESS;
@@ -235,8 +236,9 @@ int Menu::maxWater() {
             cout << "\nCode, Name, Water Amount \n";
             for(pair<string, City> codeCity : system.getCodeToCity()){
                 v = system.getNetwork().findVertex(codeCity.first);
+                if(v == nullptr) continue;
                 waterFlow = 0;
-                for(Edge<string> *e: v->getIncoming()){
+                for(Edge<string> *e: v->getAdj()){
                     waterFlow += e->getFlow();
                 }
 
@@ -263,6 +265,18 @@ int Menu::waterDeficit() {
 }
 
 int Menu::networkRebalance() {
+
+    double previousAVG = system.avgDiffPipes();
+    double previousMaxDiff = system.maxDiffPipes();
+    system.networkBalance();
+    double newAVG = system.avgDiffPipes();
+    double newMaxDiff = system.maxDiffPipes();
+
+
+    cout << "\n\tAverage diff, " << "Maximum diff  \n";
+    cout << "Before \t" << previousAVG << " \t" << previousMaxDiff << '\n';
+    cout << "After  \t" << newAVG << " \t" << newMaxDiff << '\n';
+
     return 0;
 }
 

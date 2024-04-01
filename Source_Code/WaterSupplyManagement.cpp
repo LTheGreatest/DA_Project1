@@ -597,6 +597,11 @@ void WaterSupplyManagement::edmondsKarp(const string& source, const string& targ
  */
 double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
     Vertex<string> *cityVertex = network.findVertex(cityCode);
+
+    if(cityVertex == nullptr) {
+        return 0;
+    }
+
     double deficit = codeToCity.find(cityCode)->second.getDemand();
 
     for(auto inc: cityVertex->getIncoming()){
@@ -616,8 +621,10 @@ void WaterSupplyManagement::networkBalance() {
     resetPath();
     resetVisited();
 
+    //calculates the difference of the pipes that go from the reservoirs
     for(pair<string,Reservoir> codeR : codeToReservoir){
         Vertex<string> *v = network.findVertex(codeR.first);
+        if(v == nullptr) continue;
         if(v->getAdj().size() > 1) {
             while (true) {
 
@@ -650,6 +657,7 @@ void WaterSupplyManagement::networkBalance() {
     //calculates the difference of the pipes that go from the stations
     for(pair<string,Station> codeS : codeToStation){
         Vertex<string> *v = network.findVertex(codeS.first);
+        if(v == nullptr) continue;
         if(v->getAdj().size() > 1) {
             while (true) {
 
@@ -847,6 +855,8 @@ vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& rese
     //Values that will be used to restore the graph in the end
     vector<double> weights;
     Vertex<string> *v = network.findVertex(reservoirCode);
+    if(v == nullptr)
+        return res;
     for(Edge<string> *e: v->getAdj()){
         weights.push_back(e->getWeight());
         e->setWeight(0);
