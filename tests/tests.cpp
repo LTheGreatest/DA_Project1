@@ -204,11 +204,11 @@ TEST(createSuper, createSuperSink){
 TEST(edmundsKarp, edmundsKarp){
     cleanSystem();
 
-    testSystem.readStations(DataSetSelection::BIG);
-    testSystem.readReservoirs(DataSetSelection::BIG);
-    testSystem.readCities(DataSetSelection::BIG);
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
     testSystem.insertAll();
-    testSystem.readPipes(DataSetSelection::BIG);
+    testSystem.readPipes(DataSetSelection::SMALL);
     testSystem.createSuperSource();
     testSystem.createSuperSink();
 
@@ -295,14 +295,14 @@ TEST(graphResiliency, affectedCitiesReservoir){
     testSystem.createSuperSink();
 
     double w = testSystem.getNetwork().findVertex("R_4")->getAdj().at(0)->getWeight();
-    std::vector<std::string> previouslyAffected {"C_6"};
-    std::vector<std::string> res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
+    std::vector<std::pair<std::string, double>> previouslyAffected {std::make_pair("C_6",664)};
+    std::vector<std::pair<std::string, double>> res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
 
-    EXPECT_EQ(res.size(), 2);
+    EXPECT_EQ(res.size(), 3);
     EXPECT_EQ(testSystem.getNetwork().getVertexSet().size(), 28);
     EXPECT_EQ(w,testSystem.getNetwork().findVertex("R_4")->getAdj().at(0)->getWeight() );
 
-    previouslyAffected = {"C_2"};
+    previouslyAffected = {std::make_pair("C_2",33)};
     res = testSystem.affectedCitiesReservoir("R_4", previouslyAffected);
 
     EXPECT_EQ(res.size(), 3);
@@ -322,7 +322,7 @@ TEST(resets, vertexreset){
     std::vector<std::string> destination {"PS_4", "PS_6", "PS_7", "PS_9", "PS_10"};
     std::vector<double> capacity {150, 100, 50, 100, 50};
 
-    std::vector<std::string> previouslyAffected {"C_6"};
+    std::vector<std::pair<std::string, double>> previouslyAffected {std::make_pair("C_6",664)};
     testSystem.affectedCitiesReservoir("R_4",previouslyAffected);
 
     Vertex<std::string> *v = testSystem.getNetwork().findVertex("R_4");
@@ -333,4 +333,88 @@ TEST(resets, vertexreset){
         EXPECT_EQ(e->getWeight(), capacity.at(i));
         i++;
     }
+}
+
+TEST(auxiliaryMetrics, avgPipes){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    EXPECT_EQ(testSystem.avgDiffPipes() > 173, true);
+}
+
+TEST(auxiliaryMetrics, maxPipes){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    EXPECT_EQ(testSystem.maxDiffPipes(), 750.0);
+}
+
+TEST(basicMetrics, rebalanceSmall){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::SMALL);
+    testSystem.readReservoirs(DataSetSelection::SMALL);
+    testSystem.readCities(DataSetSelection::SMALL);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::SMALL);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    double avgInitial = testSystem.avgDiffPipes();
+    double difInitial = testSystem.maxDiffPipes();
+    testSystem.networkBalance();
+    double avgFinal = testSystem.avgDiffPipes();
+    double difFinal = testSystem.maxDiffPipes();
+
+    std::cout << avgInitial << "   " << avgFinal << '\n';
+    std::cout << difInitial << "   " << difFinal << '\n';
+
+    EXPECT_EQ(avgFinal < avgInitial, true);
+    EXPECT_EQ(difFinal <= difInitial, true);
+}
+
+TEST(basicMetrics, rebalanceBig){
+    cleanSystem();
+
+    testSystem.readStations(DataSetSelection::BIG);
+    testSystem.readReservoirs(DataSetSelection::BIG);
+    testSystem.readCities(DataSetSelection::BIG);
+    testSystem.insertAll();
+    testSystem.readPipes(DataSetSelection::BIG);
+    testSystem.createSuperSource();
+    testSystem.createSuperSink();
+
+    testSystem.edmondsKarp("super_source", "super_sink");
+
+    double avgInitial = testSystem.avgDiffPipes();
+    double difInitial = testSystem.maxDiffPipes();
+    testSystem.networkBalance();
+    double avgFinal = testSystem.avgDiffPipes();
+    double difFinal = testSystem.maxDiffPipes();
+
+    std::cout << avgInitial << "   " << avgFinal << '\n';
+    std::cout << difInitial << "   " << difFinal << '\n';
+
+    EXPECT_EQ(avgFinal < avgInitial, true);
+    EXPECT_EQ(difFinal <= difInitial, true);
 }

@@ -57,13 +57,31 @@ public:
     //EdmundsKarp
     void edmondsKarp(const std::string& source, const std::string& target);
 
+    //Auxiliary Metrics
+    double avgDiffPipes();
+    double maxDiffPipes();
+
+    //auxiliary functions to balance the network
+    Edge<std::string> *edgeWithTheMaxDiff(const std::vector<Edge<std::string>*>& adj);
+    Edge<std::string> *edgeWithTheMinDiff(const std::vector<Edge<std::string>*>& adj);
+    void resetFlowChanges(Vertex<std::string> *v, int flow);
+    bool flowAdd(Vertex<std::string> *v);
+    bool flowSub(Vertex<std::string> *v);
+    void resetPath();
+    void resetVisited();
+
+
     //Basic metrics
     double flowDeficit(const std::string& cityCode );
+    void networkBalance();
+    void storeMetricsToFile();
 
     //Reliability and Sensitivity
-    std::vector<std::string> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::string> &previouslyAffected);
-    std::vector<std::pair<std::string,double>> affectedCitiesStations(const std::string& stationCode, const std::vector<std::string> &previouslyAffected);
+
+    std::vector<std::pair<std::string,double>> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::pair<std::string,double>> &previouslyAffected);
+    std::vector<std::pair<std::string,double>> affectedCitiesStations(const std::string& stationCode, const std::vector<std::pair<std::string,double>> &previouslyAffected);
     std::vector<std::pair<std::string, double>> crucialPipelines(std::vector<Edge<std::string>> &edgesToRemove,std::vector<std::pair<std::string,double>> &previouslyAffected);
+
 
 
     static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);

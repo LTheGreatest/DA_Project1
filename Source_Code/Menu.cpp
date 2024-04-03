@@ -44,7 +44,7 @@ int Menu::inputCheck(int &option, int min, int max) {
 }
 
 /** Main Menu of the system.
- *  Complexity: Varies on the functions called and how many times some of them are called.
+ *  Complexity: Varies on the functions called (depend on the users choice) and how many times some of them are called.
  * @return If there was not any error 0. Else 1.
  */
 int Menu::mainMenu() {
@@ -103,6 +103,11 @@ int Menu::mainMenu() {
     }
 }
 
+/**
+ * The menu for the basic metrics.
+ * Complexity: Varies on the functions (depend on the users choice) called and how many times some of them are called.
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::basicMetrics() {
     while (true){
         cout << "\n BASIC METRICS MENU \n";
@@ -110,12 +115,13 @@ int Menu::basicMetrics() {
         cout << "1.Maximum amount of water that can reach each or a specific city\n";
         cout << "2.Water deficit \n";
         cout << "3.Network Balance \n";
-        cout << "4.Exit the menu\n";
+        cout << "4.Store metrics to a file\n";
+        cout << "5.Exit the menu\n";
 
         int s;
         int option;
 
-        s = inputCheck(option, 1, 4);
+        s = inputCheck(option, 1, 5);
         if (s != 0) {
             cout << "Error found\n";
             return EXIT_FAILURE;
@@ -135,24 +141,52 @@ int Menu::basicMetrics() {
                 waterDeficit();
                 break;
             case 3:
+                networkRebalance();
                 break;
             case 4:
+                cout << "\nThe metrics were stored in a file called metrics.csv\n";
+                system.storeMetricsToFile();
+                break;
+            case 5:
                 return EXIT_SUCCESS;
         }
     }
 }
 
-
-vector<string> Menu::findAffectedCities(){
-    vector<string> res;
+/**
+ * Finds the cities that have water deficit to use in other menus.
+ * Complexity: O(n^2)
+ * @return Vector with a pair code/flow of each city
+ */
+vector<pair<string,double>> Menu::findAffectedCities(){
+    vector<pair<string,double>> res;
     for(pair<string, City> codeCity : system.getCodeToCity()){
-        if(system.flowDeficit(codeCity.first) > 0){
-            res.push_back(codeCity.first);
+        double deficit = system.flowDeficit(codeCity.first);
+        if( deficit > 0){
+            res.emplace_back(codeCity.first, codeCity.second.getDemand() - deficit);
         }
     }
     return res;
 }
+/**
+ * Finds the initial flow of each city before removing any reservoir, pipe or station to use in other menus.
+ * Complexity: O(n)
+ * @return Vector with a pair code/flow of each city
+ */
+std::vector<std::pair<std::string, double>> Menu::findInitialFlows() {
+    vector<pair<string,double>> res;
+    for(pair<string, City> codeCity : system.getCodeToCity()){
+        double deficit = system.flowDeficit(codeCity.first);
+        res.emplace_back(codeCity.first, codeCity.second.getDemand() - deficit);
+    }
+    return res;
+}
 
+/**
+ * The menu for the reliability and Sensitivity to failure metrics.
+ * Complexity: Varies on the functions (depend on the users choice) called and how many times some of them are called.
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::reliabilitySensivityFailure() {
     while(true){
         cout << "\n RELIABILITY AND SENSITIVITY TO FAILURES MENU \n";
@@ -176,16 +210,18 @@ int Menu::reliabilitySensivityFailure() {
         system.createSuperSource();
         system.createSuperSink();
         system.edmondsKarp("super_source", "super_sink");
-        vector<string> affectedCities = findAffectedCities();
+        vector<pair<string,double>> affectedCities = findAffectedCities();
+        vector<pair<string,double>> initialFlows = findInitialFlows();
 
         switch(option){
             case 1:
-                affectCitiesReservoir(affectedCities);
+                affectCitiesReservoir(affectedCities, initialFlows);
                 break;
             case 2:
                 affectedCitiesStations(affectedCities);
                 break;
             case 3:
+                affectedCitiesPipes(affectedCities);
                 break;
             case 4:
                 return EXIT_SUCCESS;
@@ -195,7 +231,11 @@ int Menu::reliabilitySensivityFailure() {
 }
 
 //Basic metrics =========================================================================================================
-
+/**
+ * Submenu for finding the max flow.
+ * Complexity: O(V + E) where E is the number of edges and v is the number of vertexes.
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::maxWater() {
     cout << "Do you want to select a specific city?\n";
 
@@ -236,8 +276,9 @@ int Menu::maxWater() {
             cout << "\nCode, Name, Water Amount \n";
             for(pair<string, City> codeCity : system.getCodeToCity()){
                 v = system.getNetwork().findVertex(codeCity.first);
+                if(v == nullptr) continue;
                 waterFlow = 0;
-                for(Edge<string> *e: v->getIncoming()){
+                for(Edge<string> *e: v->getAdj()){
                     waterFlow += e->getFlow();
                 }
 
@@ -250,6 +291,11 @@ int Menu::maxWater() {
 
 }
 
+/**
+ * Submenu for finding the water deficit.
+ * Complexity: O(v^2) where v is the number of vertexes
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::waterDeficit() {
     cout << "\nCode , Name,  Water deficit\n";
     double deficit = 0;
@@ -263,13 +309,38 @@ int Menu::waterDeficit() {
     return EXIT_SUCCESS;
 }
 
+/**
+ * Submenu for balancing the network.
+ * Complexity: O(VE^2 D) where v is the number of vertexes, E is the number of edges
+ * and D is unknown (number of times the while loops runs, it depends on the balance of the original graph, worst case is exponential).
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::networkRebalance() {
+
+    double previousAVG = system.avgDiffPipes();
+    double previousMaxDiff = system.maxDiffPipes();
+    system.networkBalance();
+    double newAVG = system.avgDiffPipes();
+    double newMaxDiff = system.maxDiffPipes();
+
+
+    cout << "\n\tAverage diff, " << "Maximum diff  \n";
+    cout << "Before \t" << previousAVG << " \t" << previousMaxDiff << '\n';
+    cout << "After  \t" << newAVG << " \t" << newMaxDiff << '\n';
+
     return 0;
 }
 
 //Reliability and Sensitivity to Failures ===============================================================================
 
-int Menu::affectCitiesReservoir(vector<string> &previouslyAffected) {
+/**
+ * Submenu to see the affected cities by removing a reservoir.
+ * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
+ * @param previouslyAffected Vector with pairs of city codes and their flow
+ * @param initialFlows Vector with pairs of city codes and their initial flow before the removal of the reservoirs or pipes or stations.
+ * @return If there was not any error 0. Else 1.
+ */
+int Menu::affectCitiesReservoir(vector<pair<string,double>> &previouslyAffected, const vector<pair<string,double>>& initialFlows ) {
     cout << "\nInsert the Reservoir code you want to delete from the system\n";
     string code;
     cin >> code;
@@ -280,14 +351,21 @@ int Menu::affectCitiesReservoir(vector<string> &previouslyAffected) {
         return EXIT_FAILURE;
     }
 
-    vector<string> affectedCities = system.affectedCitiesReservoir(code, previouslyAffected);
+    vector<pair<string,double>> affectedCities = system.affectedCitiesReservoir(code, previouslyAffected);
 
-    cout << "Code, Name\n";
+    cout << "Code, Name, PrevFlow, NewFlow\n";
 
-    for(string code : affectedCities){
-        auto codeReservoir = system.getCodeToCity().find(code);
+    for(pair<string, double> codeFlow : affectedCities){
+        auto codeReservoir = system.getCodeToCity().find(codeFlow.first);
 
-        cout << code << ", " << codeReservoir->second.getName() << '\n';
+        double initialFlow = 0;
+        for(pair<string, double> codeInitialFlow : initialFlows){
+            if(codeFlow.first == codeInitialFlow.first){
+                initialFlow = codeInitialFlow.second;
+            }
+        }
+
+        cout << codeFlow.first << ", " << codeReservoir->second.getName() << ", " <<initialFlow << ", " << codeFlow.second << '\n';
 
     }
 
@@ -295,7 +373,7 @@ int Menu::affectCitiesReservoir(vector<string> &previouslyAffected) {
 
 }
 
-int Menu::affectedCitiesStations(std::vector<std::string> &previouslyAffected) {
+int Menu::affectedCitiesStations(std::vector<std::pair<std::string,double>> &previouslyAffected) {
     vector<std::string> safeToDeleteStations;
     for(auto station: system.getCodeToStation()){
         vector<std::pair<std::string,double>> affectedCities=system.affectedCitiesStations(station.first,previouslyAffected);
@@ -323,9 +401,75 @@ int Menu::affectedCitiesStations(std::vector<std::string> &previouslyAffected) {
     return EXIT_SUCCESS;
 }
 
+int Menu::affectedCitiesPipes(std::vector<std::pair<std::string,double>> &previouslyAffected){
+    vector<Edge<string>> edgesToRemove;
+    bool keepAdding= true;
+    while (keepAdding){
+        cout <<"\nInput the code of the source of the edge you would like to remove\n";
+        string code1;
+        cin>>code1;
+        if(system.getCodeToCity().find(code1) == system.getCodeToCity().end() && system.getCodeToReservoir().find(code1) == system.getCodeToReservoir().end() && system.getCodeToStation().find(code1) == system.getCodeToStation().end()){
+            cout << "That source does not exist\n";
+            return EXIT_FAILURE;
+        }
+
+        cout <<"\nInput the code of the destination of the edge you would like to remove\n";
+        string code2;
+        cin>>code2;
+
+        if(system.getCodeToCity().find(code2) == system.getCodeToCity().end() && system.getCodeToReservoir().find(code2) == system.getCodeToReservoir().end() && system.getCodeToStation().find(code2) == system.getCodeToStation().end()){
+            cout << "That source does not exist\n";
+            return EXIT_FAILURE;
+        }
+
+        cout << "1.Keep adding edges\n";
+        cout << "2.Stop adding edges\n";
+
+        int option;
+
+        int s = inputCheck(option, 1, 2);
+        if (s != 0) {
+            cout << "Error found\n";
+            return EXIT_FAILURE;
+        }
+        cout << '\n';
+
+        switch (option) {
+            case 1:
+                for(auto v :system.getNetwork().getVertexSet()){
+                    for(Edge<string>* e : v->getAdj()){
+                        if(e->getOrig()->getInfo()==code1 && e->getOrig()->getInfo()==code2){
+                            edgesToRemove.push_back(*e);
+                            break;
+                        }
+                    }
+                }
+                break;
+            case 2:
+                keepAdding= false;
+                break;
+
+        }
+
+    }
+    vector<pair<string, double>> affectedCities= system.crucialPipelines(edgesToRemove,previouslyAffected);
+    cout << "The removed edges affect the following cities\n";
+
+    for(auto city : affectedCities){
+        cout << city.first <<" with a deficit of "<<city.second<<"\n";
+    }
+
+    return EXIT_SUCCESS;
+}
+
 //Menu data selection and parsing =======================================================================================
 
-int Menu::dataSelection() {
+/**
+ * Submenu used to select the data to insert into the graph.
+ * Complexity: O(n^2)
+ * @return If there was not any error 0. Else 1.
+ */
+int Menu::dataSelection() {// É NECESSARIO ALTERAR DATASETS
     cout << "\n SELECT THE DATA YOU WANT TO INSERT INTO THE SYSTEM \n";
     int s;
 
@@ -366,6 +510,10 @@ int Menu::dataSelection() {
     return EXIT_SUCCESS;
 }
 
+/** Submenu used to select reservoirs to insert into the graph.
+ * Complexity: O(n^2)
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::selectReservoirs() {
     while(true){
         string code;
@@ -408,6 +556,10 @@ int Menu::selectReservoirs() {
     }
 }
 
+/** Submenu used to select station to insert into the graph.
+ * Complexity : O(n^2)
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::selectStations() {
     while(true){
         string code;
@@ -450,6 +602,10 @@ int Menu::selectStations() {
     }
 }
 
+/** Submenu used to insert selected cities into the graph.
+ * Complexity : O(n^2)
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::selectCities() {
     while(true){
         string code;
@@ -492,6 +648,10 @@ int Menu::selectCities() {
     }
 }
 
+/** Submenu used to delete pipes from the graph.
+ * Complexity: O(n^2)
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::deletePipes() {
     while(true){
         cout << "\n Do you want to delete any pipe that exists in your current system configuration? \n";
