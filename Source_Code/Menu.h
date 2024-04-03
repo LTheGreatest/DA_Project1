@@ -32,7 +32,7 @@ public:
 
     //Reliability and Sensitivity to Failures
 
-    int affectCitiesReservoir(std::vector<std::string> &previouslyAffected);
+    int affectCitiesReservoir(std::vector<std::pair<std::string,double>> &previouslyAffected, const std::vector<std::pair<std::string, double>>& initialFlows );
     int affectedCitiesStations(std::vector<std::string> &previouslyAffected);
     int affectedCitiesPipes(std::vector<std::string> &previouslyAffected);
 
@@ -45,7 +45,8 @@ public:
     int deletePipes();
 
     //auxiliary
-    std::vector<std::string> findAffectedCities();
+    std::vector<std::pair<std::string, double>> findAffectedCities();
+    std::vector<std::pair<std::string, double>> findInitialFlows();
 
     //auxiliary function to check the inputs
     int inputCheck(int &option, int min, int max);

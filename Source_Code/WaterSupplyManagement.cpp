@@ -591,7 +591,7 @@ void WaterSupplyManagement::edmondsKarp(const string& source, const string& targ
 //Basic Metrics =====================================================================================
 /**
  * Calculates the flow deficit in a given city.
- * Complexity: O(n)
+ * Complexity: O(v) where v is the number of vertexes
  * @param cityCode City we want to analise the flow deficit
  * @return The deficit value
  */
@@ -611,6 +611,10 @@ double WaterSupplyManagement::flowDeficit(const std::string& cityCode) {
     return deficit;
 }
 
+/**
+ * Stores the Water supply metrics for every city in the graph to a file.
+ * Complexity: O(n) where n is the number os cities.
+ */
 void WaterSupplyManagement::storeMetricsToFile() {
     ofstream fout;
 
@@ -870,11 +874,11 @@ void WaterSupplyManagement::resetVisited() {
  * Gets the Cities that were affected (water supply not being met) by removing a given reservoir.
  * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
  * @param reservoirCode Code of the reservoir to be removed
- * @param previouslyAffected Vector with the code of the cities that were already with a water deficit before removing the reservoir
+ * @param previouslyAffected Vector with the code of the cities that were already with a water deficit before removing the reservoir and their flow
  * @return  Code of the cities that were affected by the removal of the reservoir.
  */
-vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& reservoirCode, vector<string> &previouslyAffected) {
-    vector<string> res;
+vector<pair<string,double>> WaterSupplyManagement::affectedCitiesReservoir(const string& reservoirCode, vector<pair<string,double>> &previouslyAffected) {
+    vector<pair<string,double>> res;
 
     //Values that will be used to restore the graph in the end
     vector<double> weights;
@@ -893,9 +897,18 @@ vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& rese
     for(pair<string, City> codeCity : codeToCity){
         double deficit = flowDeficit(codeCity.first);
         if(deficit > 0){
-            auto search = find(previouslyAffected.begin(), previouslyAffected.end(), codeCity.first);
-            if(search == previouslyAffected.end()){
-                res.push_back(codeCity.first);
+            bool isPrevAffect = false;
+            for(const pair<string, double>& codeFlow : previouslyAffected){
+                if((codeFlow.first == codeCity.first)){
+                    //Only inserts the previously affected cities if their new flow is less than their previous flow
+                    if((codeCity.second.getDemand() - codeFlow.second < deficit)){
+                        res.emplace_back(codeCity.first, codeCity.second.getDemand() - deficit );
+                    }
+                    isPrevAffect = true;
+                }
+            }
+            if(!isPrevAffect){
+                res.emplace_back(codeCity.first, codeCity.second.getDemand() - deficit);
             }
         }
     }

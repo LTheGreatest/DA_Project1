@@ -77,7 +77,7 @@ public:
     void storeMetricsToFile();
 
     //Reliability and Sensitivity
-    std::vector<std::string> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::string> &previouslyAffected);
+    std::vector<std::pair<std::string,double>> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::pair<std::string,double>> &previouslyAffected);
 
 
     static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);
