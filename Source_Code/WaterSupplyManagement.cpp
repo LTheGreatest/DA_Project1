@@ -651,5 +651,85 @@ vector<string> WaterSupplyManagement::affectedCitiesReservoir(const string& rese
     return res;
 }
 
+std::vector<std::pair<std::string,double>> WaterSupplyManagement::affectedCitiesStations(const std::string& stationCode, const std::vector<std::string> &previouslyAffected){
+    vector<std::pair<std::string,double>> res;
 
+    Vertex<string>* station=network.findVertex(stationCode);
+    vector<double> weights;
+    for(Edge<string>* e: station->getAdj()){
+        weights.push_back(e->getWeight());
+        e->setWeight(0);
+    }
+
+    edmondsKarp("super_source","super_sink");
+
+    //verifies the cities with deficit and verifies if they were already with a deficit
+    for(pair<string, City> codeCity : codeToCity){
+        double deficit = flowDeficit(codeCity.first);
+        if(deficit > 0){
+            auto search = find(previouslyAffected.begin(), previouslyAffected.end(), codeCity.first);
+            if(search == previouslyAffected.end()){
+                res.push_back({codeCity.first,deficit});
+            }
+        }
+    }
+
+    //restores the Weights of the adj pipes
+    int i = 0;
+    for(Edge<string> *e: station->getAdj()){
+        e->setWeight(weights.at(i));
+        i++;
+    }
+
+    return res;
+}
+
+vector<pair<string, double>> WaterSupplyManagement::crucialPipelines(vector<Edge<string>> &edgesToRemove,vector<pair<std::string,double>> &previouslyAffected) {
+    vector<pair<string, double>> res;
+
+    //Firstly we get all the pipelines of the network
+    vector<Edge<string>> all_edges;
+
+    for (auto vertex : network.getVertexSet()){
+        for (auto edge : vertex->getAdj()){
+            if (edge->getOrig() < edge->getDest()){
+                all_edges.push_back(*edge);
+            }
+        }
+    }
+
+    //Remove pipeline one by one and check for changes in cities
+
+    for (auto edge : edgesToRemove){
+
+        network.removeEdge(edge.getOrig()->getInfo(),edge.getDest()->getInfo());
+
+        //calculate new flow without pipeline
+        edmondsKarp("super_source", "super_sink");
+
+        //verifies the cities with deficit and verifies if they were already with a deficit
+        for(pair<string, City> codeCity : codeToCity){
+            double deficit = flowDeficit(codeCity.first);
+            if(deficit > 0){
+                bool isPrevAffect = false;
+                for(const pair<string, double>& codeFlow : previouslyAffected){
+                    if(codeFlow.first == codeCity.first){
+                        if (codeFlow.second > codeCity.second.getDemand() - deficit) {
+                            res.emplace_back(codeCity.first, deficit);
+                        }
+                        isPrevAffect = true;
+                    }
+                }
+                if (!isPrevAffect){
+                    res.emplace_back(codeCity.first, deficit);
+                }
+            }
+        }
+
+        //restore the pipeline that was removed
+        network.addEdge(edge.getOrig()->getInfo(),edge.getDest()->getInfo(),edge.getWeight());
+    }
+
+    return res;
+}
 

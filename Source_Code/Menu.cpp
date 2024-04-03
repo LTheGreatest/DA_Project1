@@ -183,6 +183,7 @@ int Menu::reliabilitySensivityFailure() {
                 affectCitiesReservoir(affectedCities);
                 break;
             case 2:
+                affectedCitiesStations(affectedCities);
                 break;
             case 3:
                 break;
@@ -294,6 +295,34 @@ int Menu::affectCitiesReservoir(vector<string> &previouslyAffected) {
 
 }
 
+int Menu::affectedCitiesStations(std::vector<std::string> &previouslyAffected) {
+    vector<std::string> safeToDeleteStations;
+    for(auto station: system.getCodeToStation()){
+        vector<std::pair<std::string,double>> affectedCities=system.affectedCitiesStations(station.first,previouslyAffected);
+        if(affectedCities.empty()){
+            safeToDeleteStations.push_back(station.second.getCode());
+        }
+        else{
+            cout<<"For the "<<station.second.getCode()<<" the affected cities are: \n";
+            for(auto city : affectedCities){
+                cout<<system.getCodeToCity()[city.first].getName()<<" with a deficit of "<<city.second<<"\n";
+            }
+
+        }
+    }
+
+    if(safeToDeleteStations.empty()){
+       cout <<"There are no stations that don't cause deficit."<<"\n";
+    }
+    else{
+        cout<<"The following stations do not cause deficit to appear in any city when removed:\n";
+        for(std::string code: safeToDeleteStations){
+            cout<<code<<"\n";
+        }
+    }
+    return EXIT_SUCCESS;
+}
+
 //Menu data selection and parsing =======================================================================================
 
 int Menu::dataSelection() {
@@ -313,15 +342,15 @@ int Menu::dataSelection() {
     cout << '\n';
 
     system.resetSystem();
-    system.readCities(DataSetSelection::BIG);
-    system.readReservoirs(DataSetSelection::BIG);
-    system.readStations(DataSetSelection::BIG);
+    system.readCities(DataSetSelection::SMALL);
+    system.readReservoirs(DataSetSelection::SMALL);
+    system.readStations(DataSetSelection::SMALL);
 
     switch (option) {
         case 1:
             //inserts all the data available
             system.insertAll();
-            system.readPipes(DataSetSelection::BIG);
+            system.readPipes(DataSetSelection::SMALL);
             break;
 
         case 2:
@@ -329,7 +358,7 @@ int Menu::dataSelection() {
             selectCities();
             selectStations();
             selectReservoirs();
-            system.readPipes(DataSetSelection::BIG);
+            system.readPipes(DataSetSelection::SMALL);
             deletePipes();
             break;
     }

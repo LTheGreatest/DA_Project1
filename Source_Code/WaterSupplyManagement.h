@@ -62,6 +62,8 @@ public:
 
     //Reliability and Sensitivity
     std::vector<std::string> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::string> &previouslyAffected);
+    std::vector<std::pair<std::string,double>> affectedCitiesStations(const std::string& stationCode, const std::vector<std::string> &previouslyAffected);
+    std::vector<std::pair<std::string, double>> crucialPipelines(std::vector<Edge<std::string>> &edgesToRemove,std::vector<std::pair<std::string,double>> &previouslyAffected);
 
 
     static void selectDataSet(DataSetSelection dataset, VertexType type, std::string *filepath);
