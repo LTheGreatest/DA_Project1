@@ -192,14 +192,15 @@ int Menu::reliabilitySensivityFailure() {
         cout << "\n RELIABILITY AND SENSITIVITY TO FAILURES MENU \n";
 
         cout << "1.Delivery capacity of the network if one specific water RESERVOIR is out of commission \n";
-        cout << "2.Delivery capacity of the network if one specific water STATION is out of service \n";
+        cout << "2.Delivery capacity of the network if one specific water STATION is out of service (checks one by one) \n";
         cout << "3.PIPELINES, if ruptured, would make it impossible to deliver the desired amount of water to a given city \n";
-        cout << "4.Exit the menu\n";
+        cout << "4.Delivery capacity of the network if one specific water STATION is out of service \n";
+        cout << "5.Exit the menu\n";
 
         int s;
         int option;
 
-        s = inputCheck(option, 1, 4);
+        s = inputCheck(option, 1, 5);
         if (s != 0) {
             cout << "Error found\n";
             return EXIT_FAILURE;
@@ -224,6 +225,9 @@ int Menu::reliabilitySensivityFailure() {
                 affectedCitiesPipes(affectedCities);
                 break;
             case 4:
+                affectedCitiesStation(affectedCities);
+                break;
+            case 5:
                 return EXIT_SUCCESS;
         }
 
@@ -373,8 +377,15 @@ int Menu::affectCitiesReservoir(vector<pair<string,double>> &previouslyAffected,
 
 }
 
+/**
+ * Submenu to see the affected cities by removing a station (does this for all stations) and verifies if no cities were affected.
+ * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
+ * @param previouslyAffected Vector with pairs of city codes and their flow
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::affectedCitiesStations(std::vector<std::pair<std::string,double>> &previouslyAffected) {
     vector<std::string> safeToDeleteStations;
+
     for(auto station: system.getCodeToStation()){
         vector<std::pair<std::string,double>> affectedCities=system.affectedCitiesStations(station.first,previouslyAffected);
         if(affectedCities.empty()){
@@ -401,62 +412,69 @@ int Menu::affectedCitiesStations(std::vector<std::pair<std::string,double>> &pre
     return EXIT_SUCCESS;
 }
 
+/**
+ * Submenu to see the affected cities by removing a station.
+ * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
+ * @param previouslyAffected Vector with pairs of city codes and their flow
+ * @return If there was not any error 0. Else 1.
+ */
+int Menu::affectedCitiesStation(std::vector<std::pair<std::string, double>> &previouslyAffected) {
+    string code;
+    cout <<"\nPlease input the code of the station you want to remove\n";
+    cin >> code;
+    if(system.getCodeToStation().find(code) == system.getCodeToStation().end()){
+        cout << "Station does not exist\n";
+        return EXIT_FAILURE;
+    }
+    vector<std::pair<std::string,double>> affectedCities=system.affectedCitiesStations(code,previouslyAffected);
+    if(affectedCities.empty()){
+        cout<<"No cities were affected\n";
+    }
+    else{
+        cout<<"For the "<<code<<" the affected cities are: \n";
+        for(auto city : affectedCities){
+            cout<<system.getCodeToCity()[city.first].getName()<<" with a deficit of "<<city.second<<"\n";
+        }
+    }
+
+    return EXIT_SUCCESS;
+}
+
+/**
+ * Submenu to see the affected cities by removing a pipe.
+ * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
+ * @param previouslyAffected Vector with pairs of city codes and their flow
+ * @return If there was not any error 0. Else 1.
+ */
 int Menu::affectedCitiesPipes(std::vector<std::pair<std::string,double>> &previouslyAffected){
     vector<Edge<string>> edgesToRemove;
     bool keepAdding= true;
-    while (keepAdding){
-        cout <<"\nInput the code of the source of the edge you would like to remove\n";
-        string code1;
-        cin>>code1;
-        if(system.getCodeToCity().find(code1) == system.getCodeToCity().end() && system.getCodeToReservoir().find(code1) == system.getCodeToReservoir().end() && system.getCodeToStation().find(code1) == system.getCodeToStation().end()){
-            cout << "That source does not exist\n";
-            return EXIT_FAILURE;
-        }
-
-        cout <<"\nInput the code of the destination of the edge you would like to remove\n";
-        string code2;
-        cin>>code2;
-
-        if(system.getCodeToCity().find(code2) == system.getCodeToCity().end() && system.getCodeToReservoir().find(code2) == system.getCodeToReservoir().end() && system.getCodeToStation().find(code2) == system.getCodeToStation().end()){
-            cout << "That source does not exist\n";
-            return EXIT_FAILURE;
-        }
-
-        cout << "1.Keep adding edges\n";
-        cout << "2.Stop adding edges\n";
-
-        int option;
-
-        int s = inputCheck(option, 1, 2);
-        if (s != 0) {
-            cout << "Error found\n";
-            return EXIT_FAILURE;
-        }
-        cout << '\n';
-
-        switch (option) {
-            case 1:
-                for(auto v :system.getNetwork().getVertexSet()){
-                    for(Edge<string>* e : v->getAdj()){
-                        if(e->getOrig()->getInfo()==code1 && e->getOrig()->getInfo()==code2){
-                            edgesToRemove.push_back(*e);
-                            break;
-                        }
-                    }
-                }
-                break;
-            case 2:
-                keepAdding= false;
-                break;
-
-        }
-
+    cout <<"\nInput the code of the source of the edge you would like to remove\n";
+    string code1;
+    cin>>code1;
+    if(system.getCodeToCity().find(code1) == system.getCodeToCity().end() && system.getCodeToReservoir().find(code1) == system.getCodeToReservoir().end() && system.getCodeToStation().find(code1) == system.getCodeToStation().end()){
+        cout << "That source does not exist\n";
+        return EXIT_FAILURE;
     }
-    vector<pair<string, double>> affectedCities= system.crucialPipelines(edgesToRemove,previouslyAffected);
+
+    cout <<"\nInput the code of the destination of the edge you would like to remove\n";
+    string code2;
+    cin>>code2;
+
+    if(system.getCodeToCity().find(code2) == system.getCodeToCity().end() && system.getCodeToReservoir().find(code2) == system.getCodeToReservoir().end() && system.getCodeToStation().find(code2) == system.getCodeToStation().end()){
+        cout << "That source does not exist\n";
+        return EXIT_FAILURE;
+    }
+    vector<pair<string, double>> affectedCities= system.crucialPipelines(code1,code2,previouslyAffected);
     cout << "The removed edges affect the following cities\n";
 
-    for(auto city : affectedCities){
-        cout << city.first <<" with a deficit of "<<city.second<<"\n";
+    if(affectedCities.empty()){
+        cout << "No cities were affected\n";
+    }
+    else{
+        for(const auto &city : affectedCities){
+            cout << city.first <<" with a deficit of "<<city.second<<"\n";
+        }
     }
 
     return EXIT_SUCCESS;
@@ -469,7 +487,7 @@ int Menu::affectedCitiesPipes(std::vector<std::pair<std::string,double>> &previo
  * Complexity: O(n^2)
  * @return If there was not any error 0. Else 1.
  */
-int Menu::dataSelection() {// É NECESSARIO ALTERAR DATASETS
+int Menu::dataSelection() {
     cout << "\n SELECT THE DATA YOU WANT TO INSERT INTO THE SYSTEM \n";
     int s;
 
@@ -486,15 +504,15 @@ int Menu::dataSelection() {// É NECESSARIO ALTERAR DATASETS
     cout << '\n';
 
     system.resetSystem();
-    system.readCities(DataSetSelection::SMALL);
-    system.readReservoirs(DataSetSelection::SMALL);
-    system.readStations(DataSetSelection::SMALL);
+    system.readCities(DataSetSelection::BIG);
+    system.readReservoirs(DataSetSelection::BIG);
+    system.readStations(DataSetSelection::BIG);
 
     switch (option) {
         case 1:
             //inserts all the data available
             system.insertAll();
-            system.readPipes(DataSetSelection::SMALL);
+            system.readPipes(DataSetSelection::BIG);
             break;
 
         case 2:
@@ -502,7 +520,7 @@ int Menu::dataSelection() {// É NECESSARIO ALTERAR DATASETS
             selectCities();
             selectStations();
             selectReservoirs();
-            system.readPipes(DataSetSelection::SMALL);
+            system.readPipes(DataSetSelection::BIG);
             deletePipes();
             break;
     }

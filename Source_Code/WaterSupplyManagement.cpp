@@ -924,6 +924,13 @@ vector<pair<string,double>> WaterSupplyManagement::affectedCitiesReservoir(const
 }
 
 
+/**
+ * Gets the Cities that were affected (water supply not being met) by removing a given station.
+ * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
+ * @param reservoirCode Code of the station to be removed
+ * @param previouslyAffected Vector with the code of the cities that were already with a water deficit before removing the reservoir and their flow
+ * @return  Code of the cities that were affected by the removal of the reservoir.
+ */
 std::vector<std::pair<std::string,double>> WaterSupplyManagement::affectedCitiesStations(const std::string& stationCode, const std::vector<std::pair<std::string,double>> &previouslyAffected){
     vector<std::pair<std::string,double>> res;
 
@@ -969,26 +976,38 @@ std::vector<std::pair<std::string,double>> WaterSupplyManagement::affectedCities
     return res;
 }
 
-vector<pair<string, double>> WaterSupplyManagement::crucialPipelines(vector<Edge<string>> &edgesToRemove,vector<pair<std::string,double>> &previouslyAffected) {
-    vector<pair<string, double>> res;
 
-    //Firstly we get all the pipelines of the network
-    vector<Edge<string>> all_edges;
+/**
+ * Checks if the pipeline is crucial (water supply not being met by removing it) and also lists the cities affected by this removal.
+ * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
+ * @param previouslyAffected Vector with the code of the cities that were already with a water deficit before removing the reservoir
+ * @param source Origin of the pipe to remove
+ * @param dest Destination of the pipe to remove
+ * @return  foreach pipe that is crucial, returns the cities that affects by removing it and the deficit of each one.
+ */
+vector<pair<string, double>> WaterSupplyManagement::crucialPipelines(const string &source, const string &dest,vector<pair<std::string,double>> &previouslyAffected) {
+    vector<pair<string, double>> res;
+    bool bidirectional = false;
+
+    double weight = 0;
 
     for (auto vertex : network.getVertexSet()){
         for (auto edge : vertex->getAdj()){
-            if (edge->getOrig() < edge->getDest()){
-                all_edges.push_back(*edge);
-            }
+            if (dest == edge->getDest()->getInfo() && source == edge->getOrig()->getInfo()) weight = edge->getWeight();
         }
     }
 
-    //Remove pipeline one by one and check for changes in cities
+    //Remove pipeline and check if its bidirectional and check for changes in cities
 
-    for (auto edge : edgesToRemove) {
+    network.removeEdge(source,dest);
 
-        network.removeEdge(edge.getOrig()->getInfo(), edge.getDest()->getInfo());
+    for (auto vertex : network.getVertexSet()){
+        for (auto edge : vertex->getAdj()){
+            if (source == edge->getDest()->getInfo() && dest == edge->getOrig()->getInfo()) bidirectional = true;
+        }
     }
+
+    if (bidirectional) network.removeEdge(dest,source);
 
     //calculate new flow without pipeline
 
@@ -1013,11 +1032,14 @@ vector<pair<string, double>> WaterSupplyManagement::crucialPipelines(vector<Edge
         }
     }
 
-    //restore the pipeline/s that was/were removed
 
-    for (auto edge : edgesToRemove) {
-        network.addEdge(edge.getOrig()->getInfo(),edge.getDest()->getInfo(),edge.getWeight());
-    }
+
+
+    //restore the pipeline that was removed
+
+    network.addEdge(source,dest,weight);
+
+    if (bidirectional) network.addEdge(dest,source,weight);
 
     return res;
 }

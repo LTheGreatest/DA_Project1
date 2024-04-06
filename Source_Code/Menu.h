@@ -35,6 +35,7 @@ public:
     int affectCitiesReservoir(std::vector<std::pair<std::string,double>> &previouslyAffected, const std::vector<std::pair<std::string, double>>& initialFlows );
     int affectedCitiesStations(std::vector<std::pair<std::string,double>> &previouslyAffected);
     int affectedCitiesPipes(std::vector<std::pair<std::string,double>> &previouslyAffected);
+    int affectedCitiesStation(std::vector<std::pair<std::string,double>> &previouslyAffected);
 
 
     //Submenus for data selection

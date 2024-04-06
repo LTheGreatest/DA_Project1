@@ -80,7 +80,7 @@ public:
 
     std::vector<std::pair<std::string,double>> affectedCitiesReservoir(const std::string& reservoirCode, std::vector<std::pair<std::string,double>> &previouslyAffected);
     std::vector<std::pair<std::string,double>> affectedCitiesStations(const std::string& stationCode, const std::vector<std::pair<std::string,double>> &previouslyAffected);
-    std::vector<std::pair<std::string, double>> crucialPipelines(std::vector<Edge<std::string>> &edgesToRemove,std::vector<std::pair<std::string,double>> &previouslyAffected);
+    std::vector<std::pair<std::string, double>> crucialPipelines(const std::string &source, const std::string &dest,std::vector<std::pair<std::string,double>> &previouslyAffected);
 
 
 
