@@ -462,7 +462,7 @@ int Menu::affectedCitiesPipes(std::vector<std::pair<std::string,double>> &previo
     cin>>code2;
 
     if(system.getCodeToCity().find(code2) == system.getCodeToCity().end() && system.getCodeToReservoir().find(code2) == system.getCodeToReservoir().end() && system.getCodeToStation().find(code2) == system.getCodeToStation().end()){
-        cout << "That source does not exist\n";
+        cout << "That destination does not exist\n";
         return EXIT_FAILURE;
     }
     vector<pair<string, double>> affectedCities= system.crucialPipelines(code1,code2,previouslyAffected);
