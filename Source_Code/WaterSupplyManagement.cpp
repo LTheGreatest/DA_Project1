@@ -927,7 +927,7 @@ vector<pair<string,double>> WaterSupplyManagement::affectedCitiesReservoir(const
 /**
  * Gets the Cities that were affected (water supply not being met) by removing a given station.
  * Complexity: O(V E^2) where V is the number of vertexes and E is the number of edges of the graph.
- * @param reservoirCode Code of the station to be removed
+ * @param stationCode Code of the station to be removed
  * @param previouslyAffected Vector with the code of the cities that were already with a water deficit before removing the reservoir and their flow
  * @return  Code of the cities that were affected by the removal of the reservoir.
  */
